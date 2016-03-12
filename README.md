@@ -1,5 +1,5 @@
 # Spatial-SheepDa
-![lamb geometry](./images/jump.png)
+![lamb geometry](images/jump.png)
 
 ## Getting Started
 0. get an AWS Account
