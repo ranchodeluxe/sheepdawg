@@ -1,0 +1,28 @@
+---
+# file: ec2_geosheep_setup.yml
+# example run: ansible-playbook -i devops/inventories/dynamic/ec2/ec2.py  devops/ec2_geosheep_setup.yml
+
+- name: setup iam users, roles and access keys
+  hosts: localhost
+  gather_facts: yes
+  roles:
+    - iam_users
+
+- name: setup ansible-lambda modules
+  hosts: localhost
+  gather_facts: no
+  roles:
+    - ansible-lambda
+
+- name: create s3 buckets
+  hosts: localhost
+  gather_facts: yes
+  roles:
+    - create_buckets_s3
+
+- name: create ec2 instance
+  hosts: localhost
+  gather_facts: yes
+  roles:
+    - create_box_ec2
+

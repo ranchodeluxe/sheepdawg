@@ -1,0 +1,11 @@
+---
+- name: install git
+  apt:
+    name: git
+    state: present
+
+- name: install build-essential
+  apt:
+    name: build-essential
+    state: present
+

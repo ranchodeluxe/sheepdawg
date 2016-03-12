@@ -1,0 +1,9 @@
+---
+# file ec2_create_instance.yml
+# $ ansible-playbook -i devops/inventories/dynamic/ec2/ec2.py  devops/ec2_create_instance.yml --ask-vault-pass
+
+- name: create ec2
+  hosts: localhost
+  gather_facts: yes
+  roles:
+    - create_box_ec2

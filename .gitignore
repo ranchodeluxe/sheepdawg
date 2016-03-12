@@ -1,0 +1,8 @@
+.idea*
+*.pem
+*.ec2
+aws_creds.sh
+ansible-lambda/
+venv/
+workspace/
+*.zip

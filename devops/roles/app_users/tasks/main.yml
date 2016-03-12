@@ -1,0 +1,23 @@
+---
+- name: groupadd 'dev'
+  group:
+    name: dev
+    state: present
+
+- name: "useradd {{ app_user }}"
+  user:
+    name: "{{ app_user }}"
+    generate_ssh_key: yes
+    shell: /bin/bash
+    createhome: yes
+    home: "/home/{{ app_user }}"
+    group: dev
+    state: present
+
+- name: add umask to /home/{{ app_user }}/.profile
+  lineinfile:
+      dest: "/home/{{ app_user }}/.profile"
+      state: present
+      regexp: '^umask 002$'
+      insertafter: '# for ssh logins, install and configure the libpam-umask package.'
+      line: 'umask 002'

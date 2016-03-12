@@ -1,0 +1,7 @@
+---
+# s3 overrides
+s3_bucket_nmspace: lambda
+s3_bucket_nmversion: v1
+s3_bucket_names:
+  - name: "{{ s3_bucket_nmspace }}-example-{{ s3_bucket_nmversion }}"
+  - name: "{{ s3_bucket_nmspace }}-example-{{ s3_bucket_nmversion }}resized"

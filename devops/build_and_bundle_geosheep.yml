@@ -1,0 +1,320 @@
+---
+# file: worldspatial provisioning
+# example run: ansible-playbook devops/provision_and_deploy_worldspatial.yml  -i devops/inventories/aws_worldspatial_sandbox.ini --private-key=world-spatial-us-west-1.pem --limit worldspatial-sandbox-ec2-1a
+
+
+- name: install base dependencies
+  hosts: all
+  gather_facts: no
+  sudo: yes
+  roles:
+    - base_debian_dependencies
+
+#- name: nodejs and npm installation
+#  hosts: all
+#  gather_facts: no
+#  sudo: yes
+#  roles:
+#    - { role: nodejs, ansible_distribution_release: trusty }
+#
+#- name: "create worldspatial app user for running the app"
+#  hosts: all
+#  gather_facts: no
+#  sudo: yes
+#  roles:
+#    - app_users
+#
+#- name: install postgresql and postgresql-common, contrib
+#  hosts: all
+#  gather_facts: no
+#  sudo: yes
+#  roles:
+#    - install_postgres
+#
+#- name: install nginx
+#  hosts: all
+#  gather_facts: no
+#  sudo: yes
+#  roles:
+#    - install_nginx
+#
+#- name: install PM2 node process manager
+#  hosts: all
+#  gather_facts: no
+#  sudo: yes
+#  tasks:
+#    - name: "'npm install' pm2 dependency"
+#      command: "/usr/bin/npm install pm2 -g"
+#      register: cat
+#
+#    - name: "dump 'npm pm2 install' output to stdout"
+#      debug: var=cat.stdout
+#
+#
+#- name: setup PGRestAPI service
+#  hosts: all
+#  sudo: no
+#  tasks:
+#    - name: git checkout PGRestAPI
+#      git:
+#        accept_hostkey: yes
+#        repo: "https://github.com/spatialdev/PGRestAPI.git"
+#        dest: "/home/{{ app_user }}/PGRestAPI"
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: render the settings file
+#      template:
+#        src: templates/pgrestapi/settings.js.j2
+#        dest: "/home/{{ app_user }}/PGRestAPI/settings/settings.js"
+#        owner: "{{ app_user }}"
+#        group: dev
+#        mode: 0777
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: "'npm install' PGRestAPI package.json dependencies"
+#      command: "/usr/bin/npm install chdir=/home/{{ app_user }}/PGRestAPI"
+#      become: yes
+#      become_user: "{{ app_user }}"
+#      register: cat
+#
+#
+#    - name: "dump 'npm install' output to stdout"
+#      debug: var=cat.stdout
+#
+#    - name: "start the PGRestAPI service"
+#      command: "/usr/bin/pm2 start app.js --name='PGRestAPI' chdir=/home/{{ app_user }}/PGRestAPI"
+#      ignore_errors: yes
+#      register: cat
+#
+#    - name: "output pm2 start app.js --name='PGRestAPI'"
+#      debug: var=cat.stdout
+#
+#- name: Add WorldSpatial nginx files
+#  hosts: all
+#  gather_facts: no
+#  sudo: yes
+#  tasks:
+#    - name: worldspatial ngnix site config
+#      template:
+#        src: templates/worldspatial/nginx_site_worldspatial.j2
+#        dest: /etc/nginx/nginx.conf
+#        owner: root
+#        group: root
+#        mode: 0640
+#      notify: restart nginx
+#
+#  handlers:
+#    - name: restart nginx
+#      service: name=nginx state=restarted
+#
+#
+#- name: setup WorldSpatial services
+#  hosts: all
+#  sudo: yes
+#  tasks:
+#    - name: make sure '/home/worldspatial/.ssh' is a directory
+#      file:
+#        dest: "/home/{{ app_user }}/.ssh"
+#        owner: "{{ app_user }}"
+#        group: dev
+#        mode: 0700
+#        state: directory
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: Create the SSH private key file
+#      copy:
+#        content: "{{ world_spatial_github_private_key }}"
+#        dest: "/home/{{ app_user }}/.ssh/id_rsa"
+#        mode: 0600
+#
+#    - name: make sure '/usr/local/src' is owned by worldspatial user
+#      file:
+#        dest: "/usr/local/src"
+#        owner: "{{ app_user }}"
+#        group: dev
+#        mode: 0744
+#        state: directory
+#
+#    - name: git checkout world-spatial repository
+#      git:
+#        accept_hostkey: yes
+#        repo: "git@github.com:thebigspoon/world-spatial.git"
+#        dest: "/usr/local/src/world-spatial"
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: create the 'ws_services' folder for data editor
+#      file:
+#        dest: "/home/{{ app_user }}/ws_services"
+#        owner: "{{ app_user }}"
+#        group: dev
+#        mode: 0744
+#        state: directory
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: create the 'ws_spatials' folder for data editor
+#      file:
+#        dest: "/home/{{ app_user }}/ws_spatials"
+#        owner: "{{ app_user }}"
+#        group: dev
+#        mode: 0744
+#        state: directory
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: create the 'www' folder for static content
+#      file:
+#        dest: "/home/{{ app_user }}/www"
+#        owner: "{{ app_user }}"
+#        group: dev
+#        mode: 0777
+#        state: directory
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: create the 'data' folder for static content
+#      file:
+#        dest: "/home/{{ app_user }}/www/data"
+#        owner: "{{ app_user }}"
+#        group: dev
+#        mode: 0777
+#        state: directory
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: "npm install forever -g"
+#      command: "/usr/bin/npm install forever -g chdir=/home/{{ app_user }}"
+#
+#    - name: "npm install grunt-cli -g"
+#      command: "/usr/bin/npm install grunt-cli -g chdir=/home/{{ app_user }}"
+#
+#    #
+#    # copying wildcard files in ansible is stupidly hard
+#    # so we utilize a bash script to do this
+#    # 1. /usr/local/src/world-spatial/data/WorldSpatialETL/* > ws_services
+#    # 2. /usr/local/src/world-spatial/web/* > www/data
+#    # 3. /usr/local/src/world-spatial/data/spatials/MENA > ws_spatials
+#    #
+#    - name: run bash script to copy relevant files
+#      command: "/bin/bash copy_worldspatial_files.sh chdir=/usr/local/src/world-spatial"
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+##    - name: copy all Javscript files to 'ws_services'
+##      command: cp "/usr/local/src/world-spatial/data/WorldSpatialETL/*" "/home/{{ app_user }}/ws_services/"
+##      become: yes
+##      become_user: "{{ app_user }}"
+#
+#    - name: overwrite the ws_services config with our templated version
+#      template:
+#        src: templates/worldspatial/ws_etl_constants.j2
+#        dest: "/home/{{ app_user }}/ws_services/ws_etl_constants.js"
+#        owner: "{{ app_user }}"
+#        group: dev
+#        mode: 0777
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: "'npm install' ws_services package.json dependencies"
+#      command: "/usr/bin/npm install chdir=/home/{{ app_user }}/ws_services"
+#      become: yes
+#      become_user: "{{ app_user }}"
+#      register: cat
+#
+#    - name: "dump 'npm install' output to stdout"
+#      debug: var=cat.stdout
+#
+##    - name: copy static files to '/www/data'
+##      command: cp -R "/usr/local/src/world-spatial/web/*" "/home/{{ app_user }}/www/data/"
+##      become: yes
+##      become_user: "{{ app_user }}"
+#
+#    - name: "'npm install' /www/data/ package.json dependencies"
+#      command: "/usr/bin/npm install chdir=/home/{{ app_user }}/www/data"
+#      become: yes
+#      become_user: "{{ app_user }}"
+#      register: cat
+#
+#    - name: "dump 'npm install' output to stdout"
+#      debug: var=cat.stdout
+#
+##    - name: copy MENA to spatials
+##      command: cp -R "/usr/local/src/world-spatial/data/spatials/MENA" "/home/{{ app_user }}/ws_spatials/"
+##      become: yes
+##      become_user: "{{ app_user }}"
+#
+#    - name: Postgresql User
+#      postgresql_user: db=world_spatial name=worldspatial priv=ALL state=present
+#
+#    - name: Postgresql DB Create
+#      postgresql_db:
+#        name: world_spatial
+#        owner: worldspatial
+#        encoding: 'UTF-8'
+#        template: 'template0'
+#
+#    #
+#    # for this next command to run
+#    # you'll need a mena.zip located in the root repository folder /<path>/world-spatial
+#    # mean.zip is a backup
+#    # of what exists on the production system
+#    # under /home/ubuntu/ws_spatials/MENA
+#    #
+#    - name: remove existing unzipped mena files
+#      command: "rm -rf /tmp/mena_unzipped"
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: copy the local mena.zip to /tmp
+#      copy:
+#        src: ../mena.zip
+#        dest: /tmp/mena.zip
+#        mode: 0777
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: install unzip
+#      apt:
+#        name: unzip
+#        state: present
+#
+#    - name: unzip the mena.zip
+#      command: unzip /tmp/mena.zip -d /tmp/mena_unzipped
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: copy mena_mbtiles
+#      command: cp -R /tmp/mena_unzipped/MENA/mena_mbtiles "/home/{{ app_user }}/ws_spatials/MENA/"
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    - name: copy mena_admin_boundaries
+#      command: cp -R /tmp/mena_unzipped/MENA/mena_admin_boundaries "/home/{{ app_user }}/ws_spatials/MENA/"
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    # ws_reset.js
+#    - name: run ws_reset.js
+#      command: "/usr/bin/node ws_reset.js chdir=/home/{{ app_user }}/ws_services"
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    # generate_MENA
+#    - name: run generate_MENA_spatial.js script
+#      command: "/usr/bin/node generate_MENA_spatial.js chdir=/home/{{ app_user }}/ws_spatials/MENA"
+#      become: yes
+#      become_user: "{{ app_user }}"
+#
+#    # node ws_start.js, forever isn't smart so stopall before starting
+#    - name: run forever stopall
+#      command: "/usr/bin/forever stopall"
+#
+#    - name: run ws_start.js
+#      command: "/usr/bin/node ws_start.js chdir=/home/{{ app_user }}/ws_services"
+
+
+

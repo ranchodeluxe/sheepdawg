@@ -1,0 +1,65 @@
+---
+- name: create IAM users
+  iam:
+    iam_type: user
+    name: "{{ item.name }}"
+    state: present
+    password: "{{ item.password }}"
+    access_key_state: create
+  with_items: iam_users
+  register: iam_user_output
+#- debug: msg="{{ new_iam_users }}"
+
+- name: save access keys
+  local_action:
+    module: copy
+    content: "{{ iam_user_output.results[0].user_meta }}"
+    dest: "./iam_{{ iam_user_output.results[0].user_meta.created_user.user_id }}_user_meta.ec2"
+  when: iam_user_output.results[0].user_meta
+  failed_when: "{{ True==False }}" # never
+  ignore_errors: yes
+
+- name: add AdminAccess policy for new user
+  iam_policy:
+    iam_type: user
+    iam_name: "{{ item.name }}"
+    region: "{{ region }}"
+    policy_name: "administrator_access"
+    state: present
+    policy_json: "{{ lookup( 'template', 'files/policies/admin_access.json.j2') }}"
+  with_items: iam_users
+  register: policy_output
+#- debug: msg="{{ policy_output }}"
+
+
+#- name: create IAM role
+#  iam:
+#    iam_type: role
+#    name: "{{ item.name }}"
+#    state: present
+#  with_items: iam_lambda_execution_roles
+#  register: iam_role_output
+#- debug: msg="{{ iam_role_output }}"
+
+# we'll need to create this role differently here
+# because Ansible by default only creates trust policies
+# for roles that are ec2-centric
+# https://github.com/ansible/ansible-modules-core/issues/2468
+# so we call out the
+- name: create IAM role
+  local_action: shell aws iam create-role --role-name="{{iam_lambda_execution_roles[0].name}}" --assume-role-policy-document="file://{{role_path}}/files/policies/lambda-s3-execution-trust-policy.json"
+  register: create_role_w_trust_response
+  ignore_errors: yes
+#- debug: msg="{{ create_role_w_trust_response }}"
+
+- name: create role policy LambdaExecutionRole
+  iam_policy:
+    iam_type: role
+    iam_name: "{{ item.name }}"
+    region: "{{ region }}"
+    policy_name: "{{ item.name }}"
+    state: present
+    policy_json: "{{ lookup( 'template', 'files/policies/lambda-s3-execution-role.json.j2') }}"
+  with_items: iam_lambda_execution_roles
+  register: policy_output
+#- debug: msg="{{ policy_output }}"

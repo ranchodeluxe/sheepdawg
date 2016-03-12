@@ -1,0 +1,44 @@
+# common
+aws_account_id: 359356595137
+region: "us-west-2"
+zone: "us-west-2a"
+subnet: ""
+iam_users:
+  - name: cugos
+    password: cugos
+iam_lambda_execution_roles:
+  - name: lambda-s3-execution-role
+
+# s3
+s3_bucket_nmspace: cugos
+s3_bucket_nmversion: v1
+s3_bucket_names:
+  - name: "{{ s3_bucket_nmspace }}-example-{{ s3_bucket_nmversion }}"
+  - name: "{{ s3_bucket_nmspace }}-example-{{ s3_bucket_nmversion }}resized"
+
+# ec2 vars
+centos_7_ami_id: "ami-63b25203"
+ec2_name: geosheep
+ec2_pkey: v1
+instance_type: t2.micro
+base_security_ingress_rules:
+  - proto: tcp
+    from_port: 0
+    to_port: 65535
+    cidr_ip: 0.0.0.0/0
+  - proto: tcp
+    from_port: 22
+    to_port: 22
+    cidr_ip: 0.0.0.0/0
+base_security_egress_rules:
+  - proto: all
+    from_port: 0
+    to_port: 65535
+    cidr_ip: 0.0.0.0/0
+remote_user: ec2-user
+
+# lambda
+s3_code_bucket_name: "{{ s3_bucket_nmspace }}-code-{{ s3_bucket_nmversion }}"
+lambda_function_name: "CreateThumbnail"
+lambda_salt: "v1"
+lambda_s3_permission_statement: "{{ lambda_function_name }}-{{ lambda_salt }}"

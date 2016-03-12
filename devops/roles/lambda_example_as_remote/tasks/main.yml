@@ -1,0 +1,90 @@
+---
+- include_vars: vars/overrides_and_extras.yml
+
+- name: upgrade all packages
+  yum:
+    name: "*"
+    state: latest
+  become: yes
+#  become_user: root
+
+- name: groupinstall gcc and buildessential and other developer tools
+  yum: name="@Development Tools" state=present
+  become: yes
+#  become_user: root
+
+- name: install python base deps
+  yum:
+    state: present
+    name: python27-devel,python27-setuptools,python27-virtualenv,python27-pip
+  become: yes
+#  become_user: root
+
+# TODO: dynamic
+- name: install libs
+  yum:
+    state: present
+    name: libjpeg-devel,zlib-devel
+  become: yes
+#  become_user: root
+
+- name: copy the handler.py and worker.py
+  copy:
+    src: "{{ lambda_src_handler_file }}"
+    dest: "{{ lambda_dst_handler_file }}"
+    owner: "{{ remote_user }}"
+    group: "{{ remote_user }}"
+    mode: 0744
+
+- name: copy the lambda requirements.txt
+  copy:
+    src: "{{ lambda_src_requirements_file }}"
+    dest: "{{ lambda_dst_requirements_file }}"
+    owner: "{{ remote_user }}"
+    group: "{{ remote_user }}"
+    mode: 0644
+
+- name: create the python virtual environment and pip install
+  pip:
+    virtualenv_command: /usr/bin/virtualenv
+    virtualenv: "{{ remote_venv_path }}"
+    requirements: "{{ lambda_dst_requirements_file }}"
+  ignore_errors: yes
+
+- name: .bashrc should activate virtual environment when we change to that user
+  lineinfile:
+    dest: "/home/{{ remote_user }}/.bashrc"
+    regexp: "^source {{ remote_venv_path }}/bin/activate; cd /home/{{ remote_user }};"
+    insertafter: "^# User specific aliases and functions"
+    line: "source {{ remote_venv_path }}/bin/activate; cd /home/{{ remote_user }};"
+
+- name: remove any existing zips from previous runs, ignore errors otherwise
+  file:
+    state: absent
+    dest: "{{ lambda_zip_path }}"
+  failed_when: "{{ True==False }}" # never
+  ignore_errors: yes
+
+- name: zip up our lambda handlers.py and workers.py
+  shell: "cd $(dirname {{ lambda_dst_handler_file }}); zip -r9 {{ lambda_zip_path }} $(basename {{ lambda_dst_handler_file }})"
+  register: venv_zip_output
+- debug: msg="{{ venv_zip_output }}"
+
+# TODO: why the fuck is Redhat pip installing in dist-packages?
+# for shell variable expansion
+- name: zip up our /lib/ site-packages
+  shell: "cd $VIRTUAL_ENV/lib/python2.7/dist-packages; zip -r9 {{ lambda_zip_path }} *"
+  register: venv_zip_output
+#- debug: msg="{{ venv_zip_output }}"
+
+# for shell variable expansion
+- name: zip up our /lib64/ site-packages
+  shell: "cd $VIRTUAL_ENV/lib64/python2.7/dist-packages; zip -r9 {{ lambda_zip_path }} *"
+  register: venv_zip_output
+#- debug: msg="{{ venv_zip_output }}"
+
+- name: fetch our bundled zipfile from remote to local
+  fetch:
+    src: "{{ lambda_zip_path }}"
+    flat: yes
+    dest: "{{ playbook_dir }}/../"
