@@ -1,6 +1,6 @@
 # Spatial-SheepDa
-
-<pre style="font-size:3px;width:200px;">
+<div>
+<pre style="font-size:3px;width:200px">
                                                                    
                             `:,`                                   
                            #,.,++#@#+`,                            
@@ -59,6 +59,7 @@
                                     #`              '#+.   ` :     
 
 </pre>
+</div>
 
 ## Getting Started
 0. get an AWS Account
