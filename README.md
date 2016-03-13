@@ -63,7 +63,7 @@ This is part tutorial and part example. The goal is to provide a workflow for ot
 0. then run this ansible playbook for the tutorial and cross your fingers.
 
     ```bash
-    $ ansible-playbook -i devops/inventories/dynamic  devops/run_aws_lambda_with_s3_tutorial.yml --private-key=./private.pem -u ec2-use
+    $ ansible-playbook -i devops/inventories/dynamic  devops/run_aws_lambda_with_s3_tutorial.yml --private-key=./private.pem -u ec2-user
     ```
 
 0. an overview of things this command does:
