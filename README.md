@@ -1,6 +1,7 @@
 # sheepda-geo
-This is part tutorial, part example and part tool. It's built using the provisioning tool Ansible. Working with AWS Lambda can be a configuration slog. This repository was built just to help with this frustration. While this could've been built with shell scripts around AWS CLI commands or directly wrapping boto calls, Ansible already wraps a lot of boto and has mostly idempotent commands. Then there's the wonderful repository `ansible-lambda` with it's idempotent lambda commands. Much thanks.
+This is part tutorial, part example and part tool. It's built using the provisioning tool Ansible. Working with AWS Lambda can be a configuration slog. This repository was built just to help with this frustration while learning to play with AWS Lambda.
 <img align="right" src="images/jump.jpg"/>
+While this could've been built with shell scripts around AWS CLI commands or directly wrapping boto calls, Ansible already wraps a lot of boto and has mostly idempotent commands. Then there's the wonderful repository `ansible-lambda` with it's idempotent lambda commands. Much thanks.
 
 ## Getting Started
 0. get an AWS Account
