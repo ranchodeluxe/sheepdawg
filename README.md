@@ -1,4 +1,4 @@
-# sheepda-geo
+# sheepdawg
 This is part tutorial, part example and part tool. The goal is to provide a base for others learning about lambda.
 <img align="right" src="images/jump.jpg"/>
 Included is a full build out of their [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). A more indepth example of creating a geoprocessing pipeline is also included for the [2016 CUGOS Spring Fling](http://cugos.org/2016-spring-fling/). It's built using the provisioning tool Ansible because working with AWS Lambda configuration can lead to boredom and frustration. While this could've been built with shell scripts around AWS CLI commands or directly wrapping boto calls, Ansible already wraps a lot of boto and has mostly idempotent commands. Then there's the wonderful repository `ansible-lambda` with it's idempotent lambda commands. Much thanks.
