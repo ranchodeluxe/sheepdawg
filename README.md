@@ -19,15 +19,15 @@ This is part tutorial and part example. The goal is to provide a workflow for ot
 0. create a shell script with your Access Key and Access Secret called `aws_creds.sh`
 
     ```bash
-    export AWS_ACCESS_KEY_ID=AKSFKLFAKERDEICPA
-    export AWS_SECRET_ACCESS_KEY=J+FAKERen0JaarxmnopeemP/xPHi
+    export AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMN
+    export AWS_SECRET_ACCESS_KEY=A+BCDEFGHIJK/LMN
     ```
 
 0. add environment variables for the new IAM user you'll be creating
 
     ```bash
-    export AWS_ACCESS_KEY_ID=AKSFKLFAKERDEICPA
-    export AWS_SECRET_ACCESS_KEY=J+FAKERen0JaarxmnopeemP/xPHi
+    export AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMN
+    export AWS_SECRET_ACCESS_KEY=A+BCDEFGHIJK/LMN
     # new lines
     export IAM_USER_NAME=cugos
     export IAM_USER_PASSWORD=cugos
@@ -47,9 +47,9 @@ This is part tutorial and part example. The goal is to provide a workflow for ot
     ```bash
     export IAM_USER_NAME="cugos"
     export IAM_USER_PASSWORD="cugos"
-    export AWS_ACCESS_KEY_ID=AKIMAPFARTOVGUKAA
-    export AWS_SECRET_ACCESS_KEY=Eo2tjTi3QMAPFARTHfd197bI/rXRen/T
-    export ACCOUNT=359356595137
+    export AWS_ACCESS_KEY_ID=ABCDEFGHIJKLMN
+    export AWS_SECRET_ACCESS_KEY=A+BCDEFGHIJK/LMN
+    export AWS_ACCOUNT_ID=123456789
     ```
 0. these are the credentials we're going to want to use for the rest of the examples so source this:
 
