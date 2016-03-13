@@ -1,0 +1,260 @@
+---
+# $ ansible-playbook -i devops/inventories/dynamic  devops/run_aws_lambda_with_s3_tutorial.yml --ask-vault-pass --private-key=./private.pem -u ec2-user
+
+# localhost
+- name: setup ansible-lambda modules
+  hosts: localhost
+  gather_facts: no
+  roles:
+    - ansible-lambda
+
+- include: "{{ playbook_dir }}/iam_create_user.yml"
+
+- name: create ec2 instance
+  hosts: localhost
+  gather_facts: yes
+  roles:
+    - create_box_ec2
+
+- name: setup the AWS Lambda example
+  hosts: localhost
+  gather_facts: yes
+  tasks:
+    - include_vars: "{{ playbook_dir }}/../overrides/aws_with_amazon_s3_tutorial_vars.yml"
+
+    # TODO: make dynamic for reuse
+    - name: create s3 bucket without policy
+      s3:
+        bucket: "{{ item.name }}"
+        region: "{{ region }}"
+        mode: create
+        permission: "public-read-write"
+      with_items: s3_bucket_names
+      register: s3_output
+    #- debug: msg="{{ s3_output }}"
+
+    # TODO: make dynamic for reuse
+    - name: create s3 bucket for code
+      s3:
+        bucket: "{{ s3_code_bucket_name }}"
+        region: "{{ region }}"
+        mode: create
+        permission: "public-read-write"
+      register: s3_output
+    #- debug: msg="{{ s3_output }}"
+
+    - name: upload HappyFace.jpg
+      s3:
+        bucket: "{{ s3_bucket_names[0].name }}"
+        region: "{{ region }}"
+        mode: put
+        permission: "public-read-write"
+        object: HappyFace.jpg
+        src: "{{ playbook_dir }}/files/lambda_tutorial/HappyFace.jpg"
+      register: s3_put_output
+    #- debug: msg="{{ s3_put_output }}"
+
+
+# remote ec2
+- name: remote build
+  hosts: ec2
+  gather_facts: yes
+  tasks:
+    - include_vars: "{{ playbook_dir }}/../overrides/aws_with_amazon_s3_tutorial_vars.yml"
+    - name: upgrade all packages
+      yum:
+        name: "*"
+        state: latest
+      become: yes
+    #  become_user: root
+
+    - name: groupinstall gcc and buildessential and other developer tools
+      yum: name="@Development Tools" state=present
+      become: yes
+    #  become_user: root
+
+    - name: install python base deps
+      yum:
+        state: present
+        name: python27-devel,python27-setuptools,python27-virtualenv,python27-pip
+      become: yes
+    #  become_user: root
+
+    # TODO: make dynamic for reuse
+    - name: install libs
+      yum:
+        state: present
+        name: libjpeg-devel,zlib-devel
+      become: yes
+    #  become_user: root
+
+    - name: copy the handler.py and worker.py
+      copy:
+        src: "{{ lambda_src_handler_file }}"
+        dest: "{{ lambda_dst_handler_file }}"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
+        mode: 0744
+
+    - name: copy the lambda requirements.txt
+      copy:
+        src: "{{ lambda_src_requirements_file }}"
+        dest: "{{ lambda_dst_requirements_file }}"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
+        mode: 0644
+
+    # do this without requirements at first
+    - name: create the python virtual environment
+      pip:
+        virtualenv_command: /usr/bin/virtualenv
+        virtualenv: "{{ remote_venv_path }}"
+
+    - name: source it
+      shell: "source {{ remote_venv_path }}/bin/activate"
+
+#    - name: .bashrc should activate virtual environment when we change to that user
+#      lineinfile:
+#        dest: "/home/{{ remote_user }}/.bashrc"
+#        regexp: "^source {{ remote_venv_path }}/bin/activate; cd /home/{{ remote_user }};"
+#        insertafter: "^# User specific aliases and functions"
+#        line: "source {{ remote_venv_path }}/bin/activate; cd /home/{{ remote_user }};"
+
+    - name: pip install the requirements
+      pip:
+        virtualenv_command: /usr/bin/virtualenv
+        virtualenv: "{{ remote_venv_path }}"
+        requirements: "{{ lambda_dst_requirements_file }}"
+
+    - name: remove any existing zips from previous runs, ignore errors otherwise
+      file:
+        state: absent
+        dest: "{{ lambda_zip_path }}"
+      ignore_errors: yes
+
+    - name: zip up our lambda handlers.py and workers.py
+      shell: "cd $(dirname {{ lambda_dst_handler_file }}); zip -r9 {{ lambda_zip_path }} $(basename {{ lambda_dst_handler_file }})"
+      register: venv_zip_output
+    - debug: msg="{{ venv_zip_output }}"
+
+    # TODO: why the fuck is RedHat pip installing in dist-packages?
+    # for shell variable expansion
+    - name: zip up our /lib/ site-packages
+      shell: "cd $VIRTUAL_ENV/lib/python2.7/dist-packages; zip -r9 {{ lambda_zip_path }} *"
+      register: venv_zip_output
+    #- debug: msg="{{ venv_zip_output }}"
+
+    # for shell variable expansion
+    - name: zip up our /lib64/ site-packages
+      shell: "cd $VIRTUAL_ENV/lib64/python2.7/dist-packages; zip -r9 {{ lambda_zip_path }} *"
+      register: venv_zip_output
+    #- debug: msg="{{ venv_zip_output }}"
+
+    - name: fetch our bundled zipfile from remote to local
+      fetch:
+        src: "{{ lambda_zip_path }}"
+        flat: yes
+        dest: "{{ playbook_dir }}/../"
+
+
+# localhost
+- name: upload our zipfile code to S3
+  hosts: localhost
+  gather_facts: yes
+  tasks:
+    # we'll need to create this role differently here
+    # because Ansible by default only creates trust policies
+    # for roles that are ec2-centric
+    # https://github.com/ansible/ansible-modules-core/issues/2468
+    # so we call out the
+    - name: create IAM role
+      local_action: shell aws iam create-role --role-name="{{iam_lambda_execution_role.name}}" --assume-role-policy-document="file://{{iam_lambda_execution_role.trust_policy_path}}"
+      register: create_role_w_trust_response
+      ignore_errors: yes
+    - debug: msg="{{ create_role_w_trust_response }}"
+
+    - name: create role policy LambdaExecutionRole
+      iam_policy:
+        iam_type: role
+        iam_name: "{{ iam_lambda_execution_role.name }}"
+        region: "{{ region }}"
+        policy_name: "{{ iam_lambda_execution_role.name }}"
+        state: present
+        policy_json: "{{ lookup( 'template', '{{ iam_lambda_execution_role.access_policy_path }}') }}"
+      register: policy_output
+    - debug: msg="{{ policy_output }}"
+
+      # becuase of ansible bug: https://github.com/ansible/ansible/issues/5442
+    - name: remove existing zipped file on S3
+      s3:
+        bucket: "{{ s3_code_bucket_name }}"
+        region: "{{ region }}"
+        mode: delete
+        object: lambda_function.zip
+      register: s3_put_output
+      ignore_errors: yes
+
+    - name: upload zipped code to S3
+      s3:
+        bucket: "{{ s3_code_bucket_name }}"
+        region: "{{ region }}"
+        mode: put
+        permission: "public-read-write"
+        object: lambda_function.zip
+        src: "{{ playbook_dir }}/../lambda_function.zip"
+      register: s3_put_output
+
+- name: create Lambda function
+  hosts: localhost
+  gather_facts: no
+  vars:
+    state: present
+    s3_event_src_bucket_name: "{{s3_bucket_names[0].name}}"
+    lambda_s3_execute_role_name: "{{ iam_lambda_execution_role.name }}"
+    project_folder: /usr/local/src/ansible-geosheep
+    deployment_package: lambda_function.zip
+    account: "{{ aws_account_id }}"
+    version_to_delete: 0
+  tasks:
+  - name: AWS Lambda Function
+    lambda:
+      state: "{{ state | default('present') }}"
+      name: "{{ lambda_function_name }}"
+      publish: True
+      description: lambda function description
+      code_s3_bucket: "{{ s3_code_bucket_name }}"
+      code_s3_key: "{{ deployment_package }}"
+      local_path: "{{ project_folder }}/{{ deployment_package }}"
+      runtime: python2.7
+      timeout: 5
+      handler: shrink_image.handler
+      memory_size: 128
+      role: "arn:aws:iam::{{account}}:role/{{lambda_s3_execute_role_name}}"
+      version: "{{ version_to_delete }}"
+    register: lambda_create_out
+  - debug: var=lambda_create_out
+  - name: show results
+    debug: var=lambda_facts
+
+    # drop down to AWS CLI for this because there's no ansible lib call yet
+  - name: grant S3 permissions to invoke this Lambda Function
+    local_action: shell aws lambda add-permission --function-name="{{lambda_function_name}}" --region="{{region}}" --statement-id="{{lambda_s3_permission_statement}}" --action="lambda:InvokeFunction" --principal=s3.amazonaws.com --source-arn="arn:aws:s3:::{{s3_event_src_bucket_name}}" --source-account="{{account}}"
+    ignore_errors: yes
+    register: lambda_permission_out
+#  - debug: var=lambda_permission_out
+
+  - name: add s3 event notifications that trigger a lambda function
+    lambda_s3_event:
+      state: "{{ state | default('present') }}"
+      bucket: "{{ s3_event_src_bucket_name }}"
+      lambda_function_configurations:
+        - id: "lambda-package-{{lambda_function_name}}"
+          lambda_function_arn: "{{ ':'.join(lambda_facts.FunctionArn.split(':')[-1]) }}"
+          events: [ 's3:ObjectCreated:*' ]
+          filter:
+            key:
+              filter_rules:
+               - name: suffix
+                 value: '*.jpg'
+    register: results
+  - debug: var=results

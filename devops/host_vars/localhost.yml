@@ -1,5 +1,5 @@
 # common
-aws_account_id: 359356595137
+aws_account_id: "{{ lookup('env','AWS_ACCOUNT_ID') }}"
 region: "us-west-2"
 zone: "us-west-2a"
 subnet: ""
@@ -7,8 +7,10 @@ iam_user:
     name: "{{ lookup('env','IAM_USER_NAME') }}"
     password: "{{ lookup('env','IAM_USER_PASSWORD') }}"
     policy_path: files/policies/aws_admin_access.json.j2
-iam_lambda_execution_roles:
-  - name: lambda-s3-execution-role
+iam_lambda_execution_role:
+  name: lambda-s3-execution-role
+  trust_policy_path: "{{playbook_dir}}/files/policies/lambda-s3-execution-trust-policy.json"
+  access_policy_path: "{{playbook_dir}}/files/policies/lambda-s3-execution-action-policy.json.j2"
 
 # s3
 s3_bucket_nmspace: cugos
@@ -20,7 +22,7 @@ s3_bucket_names:
 # ec2 vars
 centos_7_ami_id: "ami-63b25203"
 ec2_name: geosheep
-ec2_pkey: v1
+ec2_nmversion: v1
 instance_type: t2.micro
 base_security_ingress_rules:
   - proto: tcp
@@ -41,5 +43,5 @@ remote_user: ec2-user
 # lambda
 s3_code_bucket_name: "{{ s3_bucket_nmspace }}-code-{{ s3_bucket_nmversion }}"
 lambda_function_name: "CreateThumbnail"
-lambda_salt: "v1"
-lambda_s3_permission_statement: "{{ lambda_function_name }}-{{ lambda_salt }}"
+lambda_nmversion: "v1"
+lambda_s3_permission_statement: "{{ lambda_function_name }}-{{ lambda_nmversion }}"

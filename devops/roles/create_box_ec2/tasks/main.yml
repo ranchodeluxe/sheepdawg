@@ -5,24 +5,24 @@
 
 - name: create security groups
   ec2_group:
-    name: "{{ec2_name}}-{{ec2_pkey}}-security-group"
+    name: "{{ec2_name}}-{{ec2_nmversion}}-security-group"
     state: "present"
-    description: "{{ec2_name}}-{{ec2_pkey}}-security-group"
+    description: "{{ec2_name}}-{{ec2_nmversion}}-security-group"
     region: "{{region}}"
     rules: "{{base_security_ingress_rules}}"
     rules_egress: "{{base_security_egress_rules}}"
   register: ec2_group
-- debug: var=ec2_group
+#- debug: var=ec2_group
 
 - name: create ec2 key-pairs
   ec2_key:
     region: "{{region}}"
-    name: "{{ec2_name}}-{{ec2_pkey}}-keypair"
+    name: "{{ec2_name}}-{{ec2_nmversion}}-keypair"
     state: present
     wait: true
     key_material: "{{centos_ssh_public_key}}"
   register: ec2_keypair
-- debug: var=ec2_keypair
+#- debug: var=ec2_keypair
 
 - name: create ec2 instances...
   ec2:
@@ -35,10 +35,10 @@
      wait: true
      exact_count: 1
      count_tag:
-        Name: "{{ec2_name}}-{{ec2_pkey}}-ec2"
+        Name: "{{ec2_name}}-{{ec2_nmversion}}-ec2"
      instance_tags:
-        Name: "{{ec2_name}}-{{ec2_pkey}}-ec2"
-        Environment: "{{ec2_pkey}}"
+        Name: "{{ec2_name}}-{{ec2_nmversion}}-ec2"
+        Environment: "{{ec2_nmversion}}"
   register: ec2_instance
 #- debug: var=ec2_instance
 - name: pause while we wait for ssh to come up on new EC2...
