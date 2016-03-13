@@ -31,14 +31,14 @@ This is part tutorial and part example. The goal is to provide a workflow for ot
     export AWS_SECRET_ACCESS_KEY=J+FAKERen0JaarxmnopeemP/xPHi
     # new lines
     export IAM_USER_NAME=cugos
-    export IAM_USER_PASSWORD=mapfart
+    export IAM_USER_PASSWORD=cugos
     ```
 0. source it
 
     ```bash
     $ source aws_creds.sh
     ```
-0. now run the ansible playbook to create the IAM user. Note, this is just creating a new user with AdminAccess policy. To restrict the permissions override the policy json in `overrides/iam_user_vars.tml`
+0. now run the ansible playbook to create the IAM user. Note, this is just creating a new user with AdminAccess policy. To restrict the permissions override the policy json and `policy_path` in `overrides/iam_user_vars.yml`
 
     ```bash
     $ ansible-playbook -i devops/inventories/dynamic  devops/iam_create_user.yml
@@ -47,9 +47,9 @@ This is part tutorial and part example. The goal is to provide a workflow for ot
 
     ```bash
     export IAM_USER_NAME="cugos"
-    export IAM_USER_PASSWORD="mapfart"
-    export AWS_ACCESS_KEY_ID=AKIAJL2ULAFYDOVGUKAA
-    export AWS_SECRET_ACCESS_KEY=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
+    export IAM_USER_PASSWORD="cugos"
+    export AWS_ACCESS_KEY_ID=AKIMAPFARTOVGUKAA
+    export AWS_SECRET_ACCESS_KEY=Eo2tjTi3QMAPFARTHfd197bI/rXRen/T
     export ACCOUNT=359356595137
     ```
 0. these are the credentials we're going to want to use for the rest of the examples so source this:
