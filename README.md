@@ -77,6 +77,9 @@ This is part tutorial and part example. The goal is to provide a workflow for ot
 
 
 ## TODO
+0. add invoking function for Lambda tutorial
+0. get rid of the vars in the create Lambda function, also clean up any variable definition in this section
+0. use the new iam module with role from ansible-lambda
 0. remove `ansible-vault` and unencrypt public key to be used
 0. copy over all vars to the needed var overrides
 0. move reusable task to separate plays with includes
