@@ -1,7 +1,8 @@
 # sheepda-geo
 blah adsff asdf sdflajsdfklajsdlfjasdlfj sadfj jdk kskdfja lkj alkjfa dwfj aslfj
 asdfkjasdlfkjadslfj adslkadslkjlaj jdfkjlk jldjadsf lkajdflsfjlksadf lkjasdfk
-![lamb geometry](images/jump.jpg){:style="align:right;margin-right:7px;margin-top:7px;"}
+<img align="right" src="images/jump.jpg"/>
+asdfasdfadsfadsfadsfasfafdasdfafs
 
 ## Getting Started
 0. get an AWS Account
