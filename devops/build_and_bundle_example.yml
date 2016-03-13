@@ -39,6 +39,29 @@
   hosts: localhost
   gather_facts: yes
   tasks:
+    # we'll need to create this role differently here
+    # because Ansible by default only creates trust policies
+    # for roles that are ec2-centric
+    # https://github.com/ansible/ansible-modules-core/issues/2468
+    # so we call out the
+    - name: create IAM role
+      local_action: shell aws iam create-role --role-name="{{iam_lambda_execution_roles[0].name}}" --assume-role-policy-document="file://{{role_path}}/files/policies/lambda-s3-execution-trust-policy.json"
+      register: create_role_w_trust_response
+      ignore_errors: yes
+    - debug: msg="{{ create_role_w_trust_response }}"
+
+    - name: create role policy LambdaExecutionRole
+      iam_policy:
+        iam_type: role
+        iam_name: "{{ item.name }}"
+        region: "{{ region }}"
+        policy_name: "{{ item.name }}"
+        state: present
+        policy_json: "{{ lookup( 'template', 'files/policies/lambda-s3-execution-role.json.j2') }}"
+      with_items: iam_lambda_execution_roles
+      register: policy_output
+    - debug: msg="{{ policy_output }}"
+
       # ansible bug: https://github.com/ansible/ansible/issues/5442
     - name: remove existing zipped file on S3
       s3:
