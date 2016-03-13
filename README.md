@@ -1,8 +1,6 @@
 # sheepda-geo
-blah adsff asdf sdflajsdfklajsdlfjasdlfj sadfj jdk kskdfja lkj alkjfa dwfj aslfj
-asdfkjasdlfkjadslfj adslkadslkjlaj jdfkjlk jldjadsf lkajdflsfjlksadf lkjasdfk
+This is part tutorial, part example and part tool. It's built using the provisioning tool Ansible. Working with AWS Lambda can be a configuration slog. This repository was built just to help with this frustration. While this could've been built with shell scripts around AWS CLI commands or directly wrapping boto calls, Ansible already wraps a lot of boto and has mostly idempotent commands. Then there's the wonderful repository `ansible-lambda` with it's idempotent lambda commands. Much thanks.
 <img align="right" src="images/jump.jpg"/>
-asdfasdfadsfadsfadsfasfafdasdfafs
 
 ## Getting Started
 0. get an AWS Account
