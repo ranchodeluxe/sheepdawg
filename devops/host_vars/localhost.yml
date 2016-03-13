@@ -3,9 +3,10 @@ aws_account_id: 359356595137
 region: "us-west-2"
 zone: "us-west-2a"
 subnet: ""
-iam_users:
-  - name: cugos
-    password: cugos
+iam_user:
+    name: "{{ lookup('env','IAM_USER_NAME') }}"
+    password: "{{ lookup('env','IAM_USER_PASSWORD') }}"
+    policy_path: files/policies/aws_admin_access.json.j2
 iam_lambda_execution_roles:
   - name: lambda-s3-execution-role
 

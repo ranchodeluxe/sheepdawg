@@ -1,0 +1,49 @@
+---
+# run command:
+# $ ansible-playbook -i devops/inventories/dynamic  devops/iam_create_user.yml
+
+- name: setup IAM users, roles and access keys
+  hosts: localhost
+  gather_facts: yes
+  tasks:
+    - include_vars: "{{ playbook_dir }}/../overrides/iam_user_vars.yml"
+    - name: create IAM users
+      iam:
+        iam_type: user
+        name: "{{ iam_user.name }}"
+        state: present
+        password: "{{ iam_user.password }}"
+        access_key_state: create
+      register: iam_user_output
+#    - debug: var=iam_user_output
+
+    - name: set new environment variables based on output
+      set_fact:
+        new_aws_access_key: "{{ iam_user_output.user_meta.access_keys[0].access_key_id }}"
+        new_aws_secret_key: "{{ iam_user_output.user_meta.access_keys[0].secret_access_key }}"
+        account_number: "{{ iam_user_output.user_meta.created_user.arn.split(':')[4] }}"
+      when: iam_user_output.user_meta
+      register: new_facts
+      failed_when: "{{ 'changed' not in iam_user_output.keys() }}"
+      ignore_errors: yes
+#    - debug: var=new_facts
+
+    - name: create a new script aws_creds.sh
+      local_action:
+        module: template
+        src: templates/user_aws_creds.j2
+        dest: "{{ playbook_dir }}/../new_aws_creds.sh"
+        mode: 0777
+      when: new_facts.ansible_facts
+      ignore_errors: yes
+
+    - name: add AdminAccess policy for new user
+      iam_policy:
+        iam_type: user
+        iam_name: "{{ iam_user.name }}"
+        region: "{{ region }}"
+        policy_name: "administrator_access"
+        state: present
+        policy_json: "{{ lookup( 'template', '{{ iam_user.policy_path }}' ) }}"
+      register: policy_output
+#    - debug: msg="{{ policy_output }}"

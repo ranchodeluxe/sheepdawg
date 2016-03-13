@@ -1,6 +1,7 @@
 .idea*
 *.pem
 *.ec2
+new_aws_creds.sh
 aws_creds.sh
 ansible-lambda/
 venv/
