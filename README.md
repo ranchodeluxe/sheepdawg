@@ -1,6 +1,6 @@
 # sheepdawg
 <img align="right" src="images/jump.jpg"/>
-This is part tutorial and part example. The goal is to provide a workflow for others to learn about AWS Lambda without getting bogged down by all the configuration. Included is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). A more in-depth example creates a basic geoprocessing pipeline for the [2016 CUGOS Spring Fling](http://cugos.org/2016-spring-fling/) (coming soon). Everything uses the provisioning tool Ansible because working with AWS configuration can lead to boredom and death. A few people have wondered why this is built with Ansible. If this is you please read [Why Ansible](#why-ansible) section.
+This is part tutorial and part example. The goal was to provide a toolchain to write handlers for AWS Lambda without getting bogged down by all the configuration. It was created for the [2016 CUGOS Spring Fling](http://cugos.org/2016-spring-fling/). Included is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). A more in-depth example will be created showing a basic geoprocessing pipeline. Everything uses the provisioning tool Ansible because working with AWS configuration can lead to boredom and death. A few people asked why this was built with Ansible. If you feel this way, then please read the [Why Ansible](#why-ansible) section.
 
 ## Getting Started
 0. install `python-virtualenv` for your OS environment. Create a virtualenv
