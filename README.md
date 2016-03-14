@@ -83,6 +83,7 @@ A few people have asked why this wasn't built with shell scripts around AWS CLI 
 0. add invoking function for Lambda tutorial
 0. get rid of the vars in the create Lambda function, also clean up any variable definition in this section
 0. use the new iam module with role from ansible-lambda
-0. remove `ansible-vault` and unencrypt public key to be used
-0. copy over all vars to the needed var overrides
+0. write section on updating private key file
+0. remove var overrides commented out
 0. move reusable task to separate plays with includes
+0. write solution that uploadsd many images
