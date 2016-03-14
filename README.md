@@ -1,4 +1,4 @@
-# sheepdawg
+
 <img align="right" src="images/jump.jpg"/>
 This is part tutorial and part example. The goal was to provide a toolchain to write handlers for AWS Lambda without getting bogged down by all the configuration. It was created for the [2016 CUGOS Spring Fling](http://cugos.org/2016-spring-fling/). Included is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). A more in-depth example will be created showing a basic geoprocessing pipeline. Everything uses the provisioning tool Ansible because working with AWS configuration can lead to boredom and death. A few people asked why this was built with Ansible. If you feel this way, then please read the [Why Ansible](#why-ansible) section.
 
@@ -13,9 +13,9 @@ This is part tutorial and part example. The goal was to provide a toolchain to w
 0. pip install -r requirements
 
 ## Create an IAM User to Run the Examples
-0. we probably don't want to run these examples as the AWS account holder, so let's create a new IAM user
+0. we won't want to run these examples as the AWS account holder, so let's create a new IAM user
 0. first, login to your AWS account and go to Account > Security Credentials > Access Keys
-0. either use your existing keys or create and activate new ones
+0. either use your existing account holder keys or create and activate new ones
 0. create a shell script with your Access Key and Access Secret called `aws_creds.sh`
 
     ```bash
@@ -37,7 +37,7 @@ This is part tutorial and part example. The goal was to provide a toolchain to w
     ```bash
     $ source aws_creds.sh
     ```
-0. now run the ansible playbook to create the IAM user. Note, this is just creating a new user with AdminAccess policy which is not much better. To restrict the permissions override the policy json and `policy_path` in `overrides/iam_user_vars.yml`
+0. now create a new IAM user by running the following command. Note, this creates a user with AdminAccess policy which is not much better than the account holder. To restrict the permissions override the policy json and `policy_path` in `overrides/iam_user_vars.yml`
 
     ```bash
     $ ansible-playbook -i devops/inventories/dynamic  devops/iam_create_user.yml
@@ -58,7 +58,7 @@ This is part tutorial and part example. The goal was to provide a toolchain to w
     ```
 
 ## Run the AWS Lambda with Amazon S3 Tutorial Example
-0. this example is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). If you've ever tried to follow that tutorial you'll notice there's a lot of configuration and ways to screw up the result.
+0. this example is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). If you've tried to follow that tutorial you'll notice there's a lot of trapdoors and places to get lost
 0. this example is running off a set of default config vars. if you want to change these then uncomment and update the variables in `overrides/aws_with_amazon_s3_tutorial_vars.yml`. Note, the `--private-key` is referring to the ssh private key that was previously created for this tutorial. You won't have access to this key if you are not me. Since the ec2 instance is created with this matching ssh public key. you can create your own private key and cat our the public key and add it as a variable in `devops/roles/create_`
 0. then run this ansible playbook for the tutorial and cross your fingers.
 
