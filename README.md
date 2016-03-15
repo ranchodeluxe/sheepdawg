@@ -59,7 +59,7 @@ This is part tutorial and part example. The goal was to provide a toolchain for 
 
 ## Run the AWS Lambda with Amazon S3 Tutorial Example
 0. this example is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). If you've tried to follow that tutorial you'll notice there's a lot of trapdoors and places to get lost
-0. this example is running off a set of default config vars. if you want to change these then uncomment and update the variables in `overrides/aws_with_amazon_s3_tutorial_vars.yml`. Note, the `--private-key` is referring to the ssh private key that was previously created for this tutorial. You won't have access to this key if you are not me. Since the ec2 instance is created with this matching ssh public key. you can create your own private key and cat our the public key and add it as a variable in `devops/roles/create_`
+0. this example is running off a set of default config variables declared in `devops/group_vars/*.yml`. if you want to override one of these then copy and paste it into `overrides/aws_with_amazon_s3_tutorial_vars.yml`. Note, the only default variable that you have to change is the only the `--private-key` flag is referring to below. Read more about how to set that up here. It is the ssh private key that was previously created for this tutorial. You won't have access to this key if you are not me. Since the ec2 instance is created with this matching ssh public key. you can create your own private key and cat our the public key and add it as a variable in `devops/roles/create_`
 0. then run this ansible playbook for the tutorial and cross your fingers.
 
     ```bash
