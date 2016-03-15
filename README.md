@@ -73,6 +73,12 @@ This is part tutorial and part example. The goal was to provide a toolchain for 
     0. creates a Lambda function service from our built zipfile
     0. creates the correct IAM roles and permissions for S3 to invoke our Lambda function and for Lambda to access S3
 
+0. when it's done running go and test it by uploading a bunch of Lolz cats that should be resized
+
+```bash
+$ ansible-playbook -i devops/inventories/dynamic devops/test_aws_lambda_with_s3_tutorial.yml
+```
+
 ## Run the Geospatial Job Queue Example
 0. nothing yet
 
