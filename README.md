@@ -92,10 +92,7 @@ A few people have asked why this wasn't built with shell scripts around AWS CLI 
 You need to create a [passwordless ssh key pair](http://www.linuxproblem.org/art_9.html) to log into your ec2 instance. The public key will be loaded onto the ec2 box. The private key will stay local and the path will be pointed to when you run Ansible commands with the `--private-key` flag. The only you have to do is `cat` your public key and then replace the  `centos_ssh_public_key` variable that exists in `devops/group_vars/all.yml` with your new public key. *MAKE SURE IT IS INSERTED IN THE POSITION IT WAS BEFORE -- SAME NUMBER OF SPACES AT FRONT OF THE LINE, NO SPACES AT THE END*
 
 ## TODO
-0. add invoking function for Lambda tutorial
-0. get rid of the vars in the create Lambda function, also clean up any variable definition in this section
+0. using the previous build.sh script, write wrappers around building
+0. create basic geoprocessing examples
 0. use the new iam module with role from ansible-lambda
-0. write section on updating private key file
-0. remove var overrides commented out
-0. move reusable task to separate plays with includes
-0. write solution that uploadsd many images
+0. figure out why event notifications aren't working anymore on S3 buckets
