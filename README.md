@@ -94,5 +94,6 @@ You need to create a [passwordless ssh key pair](http://www.linuxproblem.org/art
 ## TODO
 0. using the previous build.sh script, write wrappers around building
 0. create basic geoprocessing examples
+0. make sure that we do the `apt-get install` part as dynamic in build on ec2 
 0. use the new iam module with role from ansible-lambda
 0. figure out why event notifications aren't working anymore on S3 buckets
