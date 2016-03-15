@@ -1,0 +1,24 @@
+---
+
+- name: upload some images to s3 bucket and what the auto resize magic
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - include_vars: "{{ playbook_dir }}/../overrides/{{ overrides_filename | default('empty') }}{{ ('.yml' in (overrides_filename|default('empty')) ) | ternary('','.yml') }}"
+    - name: list lolz
+      shell: "ls -L {{playbook_dir}}/files/lambda_tutorial/images/*.jpg"
+      register: lolz_jpegs
+#    - debug: var=lolz_jpegs
+
+    - name: upload lolz
+      s3:
+        bucket: "{{ s3_bucket_names[0].name }}" # src
+        region: "{{ region }}"
+        mode: put
+        permission: "public-read-write"
+        object: "{{ item | basename }}"
+        src: "{{ item }}"
+      with_items: "{{ lolz_jpegs.stdout_lines }}"
+
+
+

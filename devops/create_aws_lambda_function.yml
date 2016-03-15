@@ -1,0 +1,57 @@
+---
+- name: create Lambda function
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - include_vars: "{{ playbook_dir }}/../overrides/{{ overrides_filename | default('empty') }}{{ ('.yml' in (overrides_filename|default('empty')) ) | ternary('','.yml') }}"
+
+
+    - name: AWS Lambda Function
+      lambda:
+        state: "{{ state | default('present') }}"
+        name: "{{ lambda_function_name }}"
+        publish: True
+        description: lambda function description
+        code_s3_bucket: "{{ s3_code_bucket_name }}"
+        code_s3_key: "{{ deployment_package_name }}"
+        local_path: "{{ deployment_package_dir_path }}/{{ deployment_package_name }}"
+        runtime: python2.7
+        timeout: 5
+        handler: "{{ lambda_function_module_name_dot_handler }}"
+        memory_size: 128
+        region: "{{ region }}"
+        role: "arn:aws:iam::{{ aws_account_id }}:role/{{ iam_lambda_execution_role.name }}"
+        version: 0
+      register: lambda_create_out
+    - debug: var=lambda_create_out
+    - name: show results
+      debug: var=lambda_facts
+
+      # drop down to AWS CLI for this because there's no ansible wrapper call yet
+    - name: grant S3 permissions to invoke this Lambda Function
+      local_action: shell aws lambda add-permission --function-name="{{lambda_function_name}}" --region="{{region}}" --statement-id="{{lambda_s3_permission_statement}}" --action="lambda:InvokeFunction" --principal=s3.amazonaws.com --source-arn="arn:aws:s3:::{{s3_src_bucket_name}}" --source-account="{{ aws_account_id }}"
+      ignore_errors: yes
+      register: lambda_permission_out
+#    - debug: var=lambda_permission_out
+
+    - name: get the lambda permission for inspection
+      local_action: shell aws lambda get-policy --function-name="{{lambda_function_name}}" --region="{{region}}"
+      ignore_errors: yes
+      register: lambda_permission_out
+    - debug: var=lambda_permission_out
+
+    - name: add s3 event notifications that trigger a lambda function
+      lambda_s3_event:
+        state: "present"
+        bucket: "{{ s3_src_bucket_name }}"
+        lambda_function_configurations:
+          - id: "lambda-package-{{lambda_function_name}}"
+            lambda_function_arn: "{{ ':'.join( lambda_facts.FunctionArn.split(':')[:lambda_facts.FunctionArn.split(':').index(lambda_function_name)+1] ) }}"
+            events: [ 's3:ObjectCreated:*' ]
+            filter:
+              key:
+                filter_rules:
+                 - name: suffix
+                   value: '*.jpg'
+      register: results
+    - debug: var=results

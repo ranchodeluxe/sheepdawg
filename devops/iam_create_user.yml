@@ -6,7 +6,8 @@
   hosts: localhost
   gather_facts: yes
   tasks:
-    - include_vars: "{{ playbook_dir }}/../overrides/iam_user_vars.yml"
+    - include_vars: "{{ playbook_dir }}/../overrides/{{ overrides_filename | default('empty') }}{{ ('.yml' in (overrides_filename|default('empty')) ) | ternary('','.yml') }}"
+
     - name: create IAM users
       iam:
         iam_type: user

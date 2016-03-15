@@ -1,46 +1,15 @@
-## common
-#aws_account_id: "{{ lookup('env','AWS_ACCOUNT_ID') }}"
-#region: "us-west-2"
-#zone: "us-west-2a"
-#subnet: ""
-#iam_user:
-#    name: "{{ lookup('env','IAM_USER_NAME') }}"
-#    password: "{{ lookup('env','IAM_USER_PASSWORD') }}"
-#    policy_path: files/policies/aws_admin_access.json.j2
-#iam_lambda_execution_role:
-#  name: lambda-s3-execution-role
-#  trust_policy_path: "{{playbook_dir}}/files/policies/lambda-s3-execution-trust-policy.json"
-#  access_policy_path: "{{playbook_dir}}/files/policies/lambda-s3-execution-action-policy.json.j2"
 
-## s3
+# s3
 s3_bucket_nmspace: lambda
-s3_bucket_nmversion: v1
+s3_bucket_nmversion: v3
 s3_bucket_names:
   - name: "{{ s3_bucket_nmspace }}-example-{{ s3_bucket_nmversion }}"
   - name: "{{ s3_bucket_nmspace }}-example-{{ s3_bucket_nmversion }}resized"
+s3_src_bucket_name: "{{ s3_bucket_names[0].name }}"
+s3_target_bucket_name: "{{ s3_bucket_names[1].name }}"
+s3_code_bucket_name: "{{ s3_bucket_nmspace }}-code-{{ s3_bucket_nmversion }}"
 
-## ec2 vars
-#centos_7_ami_id: "ami-63b25203"
-#ec2_name: geosheep
-#ec2_pkey: v1
-#instance_type: t2.micro
-#base_security_ingress_rules:
-#  - proto: tcp
-#    from_port: 0
-#    to_port: 65535
-#    cidr_ip: 0.0.0.0/0
-#  - proto: tcp
-#    from_port: 22
-#    to_port: 22
-#    cidr_ip: 0.0.0.0/0
-#base_security_egress_rules:
-#  - proto: all
-#    from_port: 0
-#    to_port: 65535
-#    cidr_ip: 0.0.0.0/0
-#remote_user: ec2-user
-
-## lambda ec2 build box
+# lambda ec2 build box
 #remote_user: ec2-user
 remote_venv_path: "/home/{{ remote_user }}/shrink_venv"
 lambda_src_handler_file: "{{ playbook_dir }}/files/lambda_tutorial/shrink_image.py"
@@ -50,8 +19,10 @@ lambda_src_requirements_file: "{{ playbook_dir }}/files/lambda_tutorial/requirem
 lambda_zip_name: "lambda_function.zip"
 lambda_zip_path: "/home/{{ remote_user }}/{{ lambda_zip_name }}"
 
-## lambda
-#s3_code_bucket_name: "{{ s3_bucket_nmspace }}-code-{{ s3_bucket_nmversion }}"
-#lambda_function_name: "CreateThumbnail"
-#lambda_salt: "v1"
-#lambda_s3_permission_statement: "{{ lambda_function_name }}-{{ lambda_salt }}"
+# lambda
+lambda_nmversion: "v4"
+lambda_function_name: "CreateThumbnail{{lambda_nmversion}}"
+lambda_s3_permission_statement: "{{ lambda_function_name }}-{{ lambda_nmversion }}-permission-statement"
+deployment_package_dir_path: "{{ playbook_dir }}/.."
+deployment_package_name: lambda_function.zip
+lambda_function_module_name_dot_handler: "shrink_image.handler" # this is the root level Python <module name>.handler function call

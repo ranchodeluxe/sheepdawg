@@ -1,0 +1,50 @@
+---
+# localhost
+- name: upload our zipfile code to S3
+  hosts: localhost
+  gather_facts: yes
+  tasks:
+    - include_vars: "{{ playbook_dir }}/../overrides/{{ overrides_filename | default('empty') }}{{ ('.yml' in (overrides_filename|default('empty')) ) | ternary('','.yml') }}"
+
+
+    # we'll need to create this role differently here
+    # because Ansible by default only creates trust policies
+    # for roles that are ec2-centric
+    # https://github.com/ansible/ansible-modules-core/issues/2468
+    # so we call out the
+    - name: create IAM role
+      local_action: shell aws iam create-role --role-name="{{iam_lambda_execution_role.name}}" --assume-role-policy-document="file://{{iam_lambda_execution_role.trust_policy_path}}"
+      register: create_role_w_trust_response
+      ignore_errors: yes
+    - debug: msg="{{ create_role_w_trust_response }}"
+
+    - name: create role policy LambdaExecutionRole
+      iam_policy:
+        iam_type: role
+        iam_name: "{{ iam_lambda_execution_role.name }}"
+        region: "{{ region }}"
+        policy_name: "{{ iam_lambda_execution_role.name }}"
+        state: present
+        policy_json: "{{ lookup( 'template', '{{ iam_lambda_execution_role.access_policy_path }}') }}"
+      register: policy_output
+    - debug: msg="{{ policy_output }}"
+
+      # becuase of ansible bug: https://github.com/ansible/ansible/issues/5442
+    - name: remove existing zipped file on S3
+      s3:
+        bucket: "{{ s3_code_bucket_name }}"
+        region: "{{ region }}"
+        mode: delete
+        object: lambda_function.zip
+      register: s3_put_output
+      ignore_errors: yes
+
+    - name: upload zipped code to S3
+      s3:
+        bucket: "{{ s3_code_bucket_name }}"
+        region: "{{ region }}"
+        mode: put
+        permission: "public-read-write"
+        object: lambda_function.zip
+        src: "{{ playbook_dir }}/../lambda_function.zip"
+      register: s3_put_output

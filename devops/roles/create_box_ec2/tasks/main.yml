@@ -1,8 +1,6 @@
 ---
 #- debug: msg="Matched Groups:{{groups}}"
 
-- include_vars: files/ssh_keys/keys.yml
-
 - name: create security groups
   ec2_group:
     name: "{{ec2_name}}-{{ec2_nmversion}}-security-group"

@@ -1,5 +1,0 @@
----
-#iam_user:
-#    name: "{{ lookup('env','IAM_USER_NAME') }}"
-#    password: "{{ lookup('env','IAM_USER_PASSWORD') }}"
-#    policy_path: "{{ playbook_dir }}/files/policies/aws_admin_access.json.j2"

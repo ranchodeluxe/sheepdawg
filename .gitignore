@@ -7,3 +7,5 @@ ansible-lambda/
 venv/
 workspace/
 *.zip
+outputfile.txt
+fake_s3_event.json

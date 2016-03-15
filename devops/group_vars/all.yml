@@ -18,6 +18,9 @@ s3_bucket_nmversion: v1
 s3_bucket_names:
   - name: "{{ s3_bucket_nmspace }}-example-{{ s3_bucket_nmversion }}"
   - name: "{{ s3_bucket_nmspace }}-example-{{ s3_bucket_nmversion }}resized"
+s3_code_bucket_name: "{{ s3_bucket_nmspace }}-code-{{ s3_bucket_nmversion }}"
+s3_src_bucket_name: "{{ s3_bucket_names[0].name }}"
+s3_target_bucket_name: "{{ s3_bucket_names[1].name }}"
 
 # ec2 vars
 centos_7_ami_id: "ami-63b25203"
@@ -39,9 +42,13 @@ base_security_egress_rules:
     to_port: 65535
     cidr_ip: 0.0.0.0/0
 remote_user: ec2-user
+centos_ssh_public_key: |
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCqEAtrbA4WXy6tpjLEcplRokS9c1Ftp2MugkanTZnXABeBYYEu4FttaVh3YQp7y9a7nOKuneA4yGKzhDlOt4AXUkQ7RZvpQX5vAaPkck2+NM0MdTWdYlHJYlSr+FqsEvZqgUQGZiCeOLMhR9Q4WW5s/BqyFir2FeiO5RAhW46woMC8DtvoPbKBbeYFDwtRQGDy7IkBvJ8r/OXNGEUTAr0RGkyt2hWPTv23gZa/sIt+Ux8FxQAMuv5fvMMfi//zwFarRXn6uXC2m4uYRDDt7Z7v0qrkYvWomn4BWN0/b0XXyzkpksHUZXQ5g48U/yvs18e3W4+G6UOiQu4BhqvW2zq5 gcorradini@rancho
 
 # lambda
-s3_code_bucket_name: "{{ s3_bucket_nmspace }}-code-{{ s3_bucket_nmversion }}"
-lambda_function_name: "CreateThumbnail"
-lambda_nmversion: "v1"
-lambda_s3_permission_statement: "{{ lambda_function_name }}-{{ lambda_nmversion }}"
+lambda_nmversion: "v3"
+lambda_function_name: "CreateThumbnail{{lambda_nmversion}}"
+lambda_s3_permission_statement: "{{ lambda_function_name }}-{{ lambda_nmversion }}-permission-statement"
+deployment_package_dir_path: "{{ playbook_dir }}/.."
+deployment_package_name: lambda_function.zip
+lambda_function_module_name_dot_handler: "shrink_image.handler" # this is the root level Python <module name>.handler function call

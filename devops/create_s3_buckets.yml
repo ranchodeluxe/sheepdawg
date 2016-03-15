@@ -1,0 +1,27 @@
+---
+
+- name: setup the S3 buckets for example
+  hosts: localhost
+  gather_facts: yes
+  tasks:
+    - include_vars: "{{ playbook_dir }}/../overrides/{{ overrides_filename | default('empty') }}{{ ('.yml' in (overrides_filename|default('empty')) ) | ternary('','.yml') }}"
+
+
+    - name: create s3 bucket without policy
+      s3:
+        bucket: "{{ item.name }}"
+        region: "{{ region }}"
+        mode: create
+        permission: "public-read-write"
+      with_items: s3_bucket_names
+      register: s3_output
+#    - debug: msg="{{ s3_output }}"
+
+    - name: create s3 bucket for code
+      s3:
+        bucket: "{{ s3_code_bucket_name }}"
+        region: "{{ region }}"
+        mode: create
+        permission: "public-read-write"
+      register: s3_output
+#    - debug: msg="{{ s3_output }}"

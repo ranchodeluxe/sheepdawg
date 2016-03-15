@@ -1,0 +1,29 @@
+---
+
+- name: execute lambda function
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - include_vars: "{{ playbook_dir }}/../overrides/{{ overrides_filename | default('empty') }}{{ ('.yml' in (overrides_filename|default('empty')) ) | ternary('','.yml') }}"
+
+    - name: create a fake json request
+      local_action:
+        module: template
+        src: templates/fake_s3_event.json.j2
+        dest: "{{ playbook_dir }}/../fake_s3_event.json"
+        mode: 0777
+
+#    - name: invoke lambda
+#      lambda_invoke:
+#        function_name: "{{ lambda_function_name }}"
+#        invocation_type: Event
+#        log_type: Tail
+#        region: "{{ region }}"
+#        payload: "{{ playbook_dir }}/../fake_s3_event.json"
+#      register: invoke_response
+#    - debug: var=invoke_response
+
+    - name: invoke lambda
+      local_action: shell aws lambda invoke --invocation-type=Event --function-name="{{lambda_function_name}}" --region="{{region}}" --payload="file://{{ playbook_dir }}/../fake_s3_event.json" outputfile.txt
+      register: invoke_response
+    - debug: var=invoke_response
