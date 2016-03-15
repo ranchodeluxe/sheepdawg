@@ -58,8 +58,8 @@ This is part tutorial and part example. The goal was to provide a toolchain for 
     ```
 
 ## Run the AWS Lambda with Amazon S3 Tutorial Example
-0. this example is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). If you've tried to follow that tutorial you'll notice there's a lot of trapdoors and places to get lost
-0. this example is running off a set of default config variables declared in `devops/group_vars/*.yml`. if you want to override one of these then copy and paste it into `overrides/aws_with_amazon_s3_tutorial_vars.yml`. Note, the only default variable that you have to change is the only the `--private-key` flag is referring to below. Read more about how to set that up here. It is the ssh private key that was previously created for this tutorial. You won't have access to this key if you are not me. Since the ec2 instance is created with this matching ssh public key. you can create your own private key and cat our the public key and add it as a variable in `devops/roles/create_`
+0. this example is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html)
+0. this example is running off a set of default config variables declared in `devops/group_vars/*.yml`. if you want to override one of these then copy and paste it into `overrides/aws_with_amazon_s3_tutorial_vars.yml`. Note, the only default variable that you *have to change* is the `centos_ssh_public_key` which determines how you ssh into the ec2 build box. Read more about that in (creating-ssh-keys)[#create ssh keys]
 0. then run this ansible playbook for the tutorial and cross your fingers.
 
     ```bash
@@ -87,6 +87,9 @@ This is part tutorial and part example. The goal was to provide a toolchain for 
 
 ## Why Ansible
 A few people have asked why this wasn't built with shell scripts around AWS CLI commands, wrapping boto calls outright or using AWS CloudFormation tools. Ansible already wraps a lot of boto and a good number of commands are already idempotent. An additional upsell was getting to work with the great [Ansible Lambda wrappers](https://github.com/pjodouin/ansible-lambda).
+
+## Creating SSH Keys
+You need to create a [passwordless ssh key pair](http://www.linuxproblem.org/art_9.html) to log into your ec2 instance. The public key will be loaded onto the ec2 box. The private key will stay local and the path will be pointed to when you run Ansible commands with the `--private-key` flag. The only you have to do is `cat` your public key and then replace the  `centos_ssh_public_key` variable that exists in `devops/group_vars/all.yml` with your new public key. *MAKE SURE IT IS INSERTED IN THE POSITION IT WAS BEFORE -- NEW LINE TABBED IN, NO SPACES AT THE END*
 
 ## TODO
 0. add invoking function for Lambda tutorial
