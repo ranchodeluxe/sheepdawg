@@ -63,7 +63,10 @@ This is part tutorial and part example. The goal was to provide a toolchain for 
 0. then run this ansible playbook for the tutorial and cross your fingers.
 
     ```bash
-    $ ansible-playbook -i devops/inventories/dynamic  devops/run_aws_lambda_with_s3_tutorial.yml --private-key=./private.pem -u ec2-user
+    $ ansible-playbook \
+        -i devops/inventories/dynamic \
+        devops/run_aws_lambda_with_s3_tutorial.yml \
+        --private-key=./private.pem -u ec2-user
     ```
 
 0. an overview of things this command does:
@@ -75,9 +78,11 @@ This is part tutorial and part example. The goal was to provide a toolchain for 
 
 0. when it's done running go and test it by uploading a bunch of Lolz cats that should be resized
 
-```bash
-$ ansible-playbook -i devops/inventories/dynamic devops/test_aws_lambda_with_s3_tutorial.yml
-```
+    ```bash
+    $ ansible-playbook \
+        -i devops/inventories/dynamic \
+        devops/test_aws_lambda_with_s3_tutorial.yml
+    ```
 
 ## Run the Geospatial Job Queue Example
 0. nothing yet
