@@ -1,6 +1,6 @@
 
 <img align="right" src="images/jump.jpg"/>
-This is part tutorial and part example. The goal was to provide a toolchain for writing AWS Lambda handlers without getting bogged down by all the configuration. It was created for the [2016 CUGOS Spring Fling](http://cugos.org/2016-spring-fling/). Included is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). A more in-depth example will be created showing a basic geoprocessing pipeline. Everything uses the provisioning tool Ansible because working with AWS configuration can lead to boredom and death. A few people asked why this was built with Ansible. If you feel this way, then please read the [Why Ansible](#why-ansible) section.
+This is part tutorial and part example. The goal was to build a toolchain to help myself and others write AWS Lambda handlers without the configuration bogging us down. It was created for a [2016 CUGOS Spring Fling](http://cugos.org/2016-spring-fling/) workshop. Included is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). A more in-depth example will be created showing a basic geoprocessing pipeline. Everything uses the provisioning tool Ansible because working with AWS configuration can lead to boredom and death. A few people asked why this was built with Ansible. If you feel this way, then please read the [Why Ansible](#why-ansible) section.
 
 ## Getting Started
 0. install `python-virtualenv` for your OS environment. Create a virtualenv
@@ -95,4 +95,5 @@ You need to create a [passwordless ssh key pair](http://www.linuxproblem.org/art
 0. use the new iam module with role from ansible-lambda
 0. make sure that we do the `apt-get install` part as dynamic in build on ec2 for create build machine
 0. create basic geoprocessing example: GeoJSON polygons in, buffer, merge, zipped shapefile out
+0. write tear-down script
 
