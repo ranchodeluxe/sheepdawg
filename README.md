@@ -96,4 +96,5 @@ You need to create a [passwordless ssh key pair](http://www.linuxproblem.org/art
 0. make sure that we do the `apt-get install` part as dynamic in build on ec2 for create build machine
 0. create basic geoprocessing example: GeoJSON polygons in, buffer, merge, zipped shapefile out
 0. write tear-down script
+0. run it as the `cugos` user to make sure it can work as chid account
 
