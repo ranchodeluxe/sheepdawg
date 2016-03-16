@@ -24,7 +24,7 @@ s3_target_bucket_name: "{{ s3_bucket_names[1].name }}"
 
 # ec2 vars
 centos_7_ami_id: "ami-63b25203"
-ec2_name: geosheep
+ec2_name: sheepdawg
 ec2_nmversion: v1
 instance_type: t2.micro
 base_security_ingress_rules:
@@ -45,7 +45,7 @@ remote_user: ec2-user
 centos_ssh_public_key: |
         ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCqEAtrbA4WXy6tpjLEcplRokS9c1Ftp2MugkanTZnXABeBYYEu4FttaVh3YQp7y9a7nOKuneA4yGKzhDlOt4AXUkQ7RZvpQX5vAaPkck2+NM0MdTWdYlHJYlSr+FqsEvZqgUQGZiCeOLMhR9Q4WW5s/BqyFir2FeiO5RAhW46woMC8DtvoPbKBbeYFDwtRQGDy7IkBvJ8r/OXNGEUTAr0RGkyt2hWPTv23gZa/sIt+Ux8FxQAMuv5fvMMfi//zwFarRXn6uXC2m4uYRDDt7Z7v0qrkYvWomn4BWN0/b0XXyzkpksHUZXQ5g48U/yvs18e3W4+G6UOiQu4BhqvW2zq5 gcorradini@rancho
 
-# lambda
+# lambda function
 lambda_nmversion: "v3"
 lambda_function_name: "CreateThumbnail{{lambda_nmversion}}"
 lambda_s3_permission_statement: "{{ lambda_function_name }}-{{ lambda_nmversion }}-permission-statement"

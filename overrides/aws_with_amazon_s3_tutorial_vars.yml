@@ -1,7 +1,9 @@
+# ec2 vars
+ec2_name: tutorial
 
 # s3
 s3_bucket_nmspace: lambda
-s3_bucket_nmversion: v3
+s3_bucket_nmversion: v1
 s3_bucket_names:
   - name: "{{ s3_bucket_nmspace }}-example-{{ s3_bucket_nmversion }}"
   - name: "{{ s3_bucket_nmspace }}-example-{{ s3_bucket_nmversion }}resized"
@@ -20,7 +22,7 @@ lambda_zip_name: "lambda_function.zip"
 lambda_zip_path: "/home/{{ remote_user }}/{{ lambda_zip_name }}"
 
 # lambda
-lambda_nmversion: "v4"
+lambda_nmversion: v1
 lambda_function_name: "CreateThumbnail{{lambda_nmversion}}"
 lambda_s3_permission_statement: "{{ lambda_function_name }}-{{ lambda_nmversion }}-permission-statement"
 deployment_package_dir_path: "{{ playbook_dir }}/.."

@@ -1,6 +1,5 @@
 ---
-# lambda ec2 build box
-remote_user: ec2-user
+# ec2 build box
 remote_venv_path: "/home/{{ remote_user }}/venv"
 lambda_src_handler_file: "/usr/local/src/ansible-geosheep/workspace/handler.py"
 lambda_dst_handler_file: "/home/{{ remote_user }}/handler.py"

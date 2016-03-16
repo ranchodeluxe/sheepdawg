@@ -45,7 +45,7 @@
         state: "present"
         bucket: "{{ s3_src_bucket_name }}"
         lambda_function_configurations:
-          - id: "lambda-package-{{lambda_function_name}}"
+          - id: "S3EventNotification{{lambda_function_name}}"
             lambda_function_arn: "{{ ':'.join( lambda_facts.FunctionArn.split(':')[:lambda_facts.FunctionArn.split(':').index(lambda_function_name)+1] ) }}"
             events: [ 's3:ObjectCreated:*' ]
             filter:
