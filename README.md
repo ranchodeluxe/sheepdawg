@@ -3,7 +3,7 @@
 This is part tutorial and part example. The goal was to build a toolchain to help myself and others write AWS Lambda handlers without the configuration headaches. It was created for a [2016 CUGOS Spring Fling](http://cugos.org/2016-spring-fling/) workshop. Included is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). A more in-depth example will be created showing a basic geoprocessing pipeline. Everything uses the provisioning tool Ansible because working with AWS configuration can lead to boredom and death. A few people asked why this was built with Ansible. If you feel this way, then please read the [Why Ansible](#why-ansible) section.
 
 ## Getting Started
-0. install `python-virtualenv` for your OS environment and create a virtualenv ( linux below, [mac-osx here](http://www.marinamele.com/2014/05/install-python-virtualenv-virtualenvwrapper-mavericks.html), avoid windows ):
+0. install `python-virtualenv` for your OS environment ( linux below, [mac-osx here](http://www.marinamele.com/2014/05/install-python-virtualenv-virtualenvwrapper-mavericks.html), avoid windows ):
 
     ```bash
     DEFAULT_PY=$(which python)
