@@ -47,10 +47,5 @@
           - id: "S3EventNotification{{lambda_function_name}}"
             lambda_function_arn: "{{ ':'.join( lambda_facts.FunctionArn.split(':')[:lambda_facts.FunctionArn.split(':').index(lambda_function_name)+1] ) }}"
             events: [ 's3:ObjectCreated:*' ]
-            filter:
-              key:
-                filter_rules:
-                 - name: suffix
-                   value: '*.jpg'
       register: results
     - debug: var=results
