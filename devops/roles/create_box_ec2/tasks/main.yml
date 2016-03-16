@@ -32,6 +32,7 @@
      image: "{{centos_7_ami_id}}"
      wait: true
      exact_count: 1
+     state: present
      count_tag:
         Name: "{{ec2_name}}-{{ec2_nmversion}}-ec2"
      instance_tags:

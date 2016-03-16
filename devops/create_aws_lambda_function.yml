@@ -32,7 +32,6 @@
       local_action: shell aws lambda add-permission --function-name="{{lambda_function_name}}" --region="{{region}}" --statement-id="{{lambda_s3_permission_statement}}" --action="lambda:InvokeFunction" --principal=s3.amazonaws.com --source-arn="arn:aws:s3:::{{s3_src_bucket_name}}" --source-account="{{ aws_account_id }}"
       ignore_errors: yes
       register: lambda_permission_out
-#    - debug: var=lambda_permission_out
 
     - name: get the lambda permission for inspection
       local_action: shell aws lambda get-policy --function-name="{{lambda_function_name}}" --region="{{region}}"

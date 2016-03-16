@@ -12,11 +12,23 @@
     # for roles that are ec2-centric
     # https://github.com/ansible/ansible-modules-core/issues/2468
     # so we call out the
-    - name: create IAM role
-      local_action: shell aws iam create-role --role-name="{{iam_lambda_execution_role.name}}" --assume-role-policy-document="file://{{iam_lambda_execution_role.trust_policy_path}}"
-      register: create_role_w_trust_response
-      ignore_errors: yes
-    - debug: msg="{{ create_role_w_trust_response }}"
+    #- name: create IAM role
+    #  local_action: shell aws iam create-role --role-name="{{iam_lambda_execution_role.name}}" --assume-role-policy-document="file://{{iam_lambda_execution_role.trust_policy_path}}"
+    #  register: create_role_w_trust_response
+    #  ignore_errors: yes
+    #- debug: msg="{{ create_role_w_trust_response }}"
+    - name: create IAM Role with Lambda Trust Policy
+      iam:
+        iam_type: role
+        name: "{{iam_lambda_execution_role.name}}"
+        state: present
+        trust_policy:
+          Version: '2012-10-17'
+          Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
 
     - name: create role policy LambdaExecutionRole
       iam_policy:
