@@ -66,8 +66,9 @@ This is part tutorial and part example. The goal was to build a toolchain to hel
 
 ## Run the AWS Lambda with Amazon S3 Tutorial Example
 0. this example is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html)
-0. this example is running off a set of default config variables declared in `devops/group_vars/*.yml`. if you want to override one of these then copy and paste it into `overrides/aws_with_amazon_s3_tutorial_vars.yml`. Note, the only default variable that you **have to change** is the `centos_ssh_public_key` which allows you to ssh into the ec2 build box and matches the private ssh key passed in during commands as `--private-key` flag`. Read more about that in (creating-ssh-keys)[#create-ssh-keys]
+0. this example is running off a set of default config variables declared in `devops/group_vars/*.yml`. if you want to override one of these then copy and paste it into `overrides/aws_with_amazon_s3_tutorial_vars.yml`. Note, the only default variable that you **have to change** is the `centos_ssh_public_key` which allows you to ssh into the ec2 build box and matches the private ssh key passed in during commands as `--private-key` flag. Read more about that in (Creating SSH Keys)[#creating-ssh-keys]
 0. create an ec2 build box where we we'll bundle our Lambda code and it's dependencies into a zipfile as [described in the tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html)
+
     ```bash
     $ ansible-playbook ./devops/ec2_create_instance.yml --extra-vars="overrides_filename=aws_with_amazon_s3_tutorial_vars"
     ```
@@ -91,14 +92,17 @@ This is part tutorial and part example. The goal was to build a toolchain to hel
 ## Run a Geoprocessing Example that Converts a Raster to GeoJSON with PROJ4, GDAL and GEOS shared libs
 0. there's a lot of tricks and trapdoors that are still being worked out in this example. Based on [work done here](http://www.perrygeo.com/running-python-with-compiled-code-on-aws-lambda.html)
 0. let's use the same credentials created at the beginning of this tutorial, so source this for good measures:
+
     ```bash
     $ source new_aws_creds.sh
     ```
 0. create a new build box. `t2.micro` will build the C dependencies very slow. this example uses overrides for a larger image and also different names so we can tell the AWS infrastructure apart. modify `overrides/geoprocessing_example.yml` if needed.
+
     ```bash
     $ ansible-playbook ./devops/ec2_create_instance.yml --extra-vars="overrides_filename=geoprocessing_example"
     ```
 0. then run this command to setup the S3 buckets, Lambda function, policies and permissions. make sure you have some coffee at hand. it's gonna take awhile to build to the C libs.
+
     ```bash
     $ ansible-playbook -i devops/inventories/dynamic \
         devops/run_geoprocessor_example.yml --private-key=./private.pem -u ec2-user \
