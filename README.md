@@ -66,7 +66,7 @@ This is part tutorial and part example. The goal was to build a toolchain to hel
 
 ## Run the AWS Lambda with Amazon S3 Tutorial Example
 0. this example is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html)
-0. this example is running off a set of default config variables declared in `devops/group_vars/*.yml`. if you want to override one of these then copy and paste it into `overrides/aws_with_amazon_s3_tutorial_vars.yml`. Note, the only default variable that you **have to change** is the `centos_ssh_public_key` which determines how you ssh into the ec2 build box and should mirror the private ssh key passed in commands as `--private-key` flag`. Read more about that in (creating-ssh-keys)[#create-ssh-keys]
+0. this example is running off a set of default config variables declared in `devops/group_vars/*.yml`. if you want to override one of these then copy and paste it into `overrides/aws_with_amazon_s3_tutorial_vars.yml`. Note, the only default variable that you **have to change** is the `centos_ssh_public_key` which allows you to ssh into the ec2 build box and matches the private ssh key passed in during commands as `--private-key` flag`. Read more about that in (creating-ssh-keys)[#create-ssh-keys]
 0. create an ec2 build box where we we'll bundle our Lambda code and it's dependencies into a zipfile as [described in the tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html)
     ```bash
     $ ansible-playbook ./devops/ec2_create_instance.yml --extra-vars="overrides_filename=aws_with_amazon_s3_tutorial_vars"
