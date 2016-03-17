@@ -10,13 +10,13 @@
   roles:
     - ansible-lambda
 
-- include: "{{ playbook_dir }}/iam_create_user.yml"
+#- include: "{{ playbook_dir }}/iam_create_user.yml"
 
-- name: create ec2 instance
-  hosts: localhost
-  gather_facts: yes
-  roles:
-    - create_box_ec2
+#- name: create ec2 instance
+#  hosts: localhost
+#  gather_facts: yes
+#  roles:
+#    - create_box_ec2
 
 - include: "{{ playbook_dir }}/create_s3_buckets.yml"
 

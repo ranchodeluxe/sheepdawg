@@ -14,11 +14,11 @@ s3_code_bucket_name: "{{ s3_bucket_nmspace }}-code-{{ s3_bucket_nmversion }}"
 
 # lambda ec2 build box
 remote_working_dir: "/home/{{ remote_user }}/lambda"
-remote_venv_path: "/home/{{ remote_user }}/venv"
+remote_venv_path: "/home/{{ remote_user }}/lambda/venv"
 lambda_src_handler_file: "{{ playbook_dir }}/files/geo/handler.py"
 lambda_dst_handler_file: "/home/{{ remote_user }}/lambda/handler.py"
 lambda_src_worker_file: "{{ playbook_dir }}/files/geo/worker.py"
-lambda_dst_worker_file: "/home/{{ remote_user }}/lambda/geoprocess.py"
+lambda_dst_worker_file: "/home/{{ remote_user }}/lambda/worker.py"
 lambda_src_requirements_file: "{{ playbook_dir }}/files/geo/requirements.txt"
 #lambda_dst_requirements_file: "/home/{{ remote_user }}/requirements.txt"
 lambda_zip_name: "lambda_function.zip"
@@ -27,6 +27,11 @@ yum_dependency_list:
   - libjpeg-devel
   - zlib-devel
   - gcc-c++
+so_extras_to_bundle:
+  - local/lib/libgdal.so
+  - local/lib/libgdal.so.1
+  - local/lib/libgeos_c.so
+  - local/lib/libgeos_c.so.1
 
 # lambda
 lambda_nmversion: v1

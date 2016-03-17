@@ -11,20 +11,33 @@
         state: absent
         dest: "{{ lambda_zip_path }}"
 
-    - name: zip up our lambda handlers.py and workers.py
-      shell: "cd $(dirname {{ lambda_dst_handler_file }}); zip -r9 {{ lambda_zip_path }} $(basename {{ lambda_dst_handler_file }})"
+    - name: zip up our lambda handlers.py
+      shell: "zip -r9 {{ lambda_zip_path }} $(basename {{ lambda_dst_handler_file }}) chdir={{ remote_working_dir }}"
       register: venv_zip_output
-    - debug: msg="{{ venv_zip_output }}"
+  #  - debug: msg="{{ venv_zip_output }}"
+
+    - name: zip up our lambda workers.py
+      shell: "zip -r9 {{ lambda_zip_path }} $(basename {{ lambda_dst_worker_file }}) chdir={{ remote_working_dir }}"
+      register: venv_zip_output
+  #  - debug: msg="{{ venv_zip_output }}"
+      when: lambda_src_worker_file is defined and lambda_dst_worker_file is defined
+
+    - name: zip up any extra shared libs
+      shell: "zip -r9 {{ lambda_zip_path }} {{ item }} chdir={{ remote_working_dir }}"
+      register: zip_output
+  #  - debug: msg="{{ zip_output }}"
+      with_items: so_extras_to_bundle
+      when: so_extras_to_bundle is defined
 
     # for shell variable expansion
     - name: zip up our /lib/ site-packages
-      shell: "cd $VIRTUAL_ENV/lib/python2.7/dist-packages; zip -r9 {{ lambda_zip_path }} *"
+      shell: "zip -r9 {{ lambda_zip_path }} * chdir={{ remote_venv_path }}/lib/python2.7/dist-packages/"
       register: venv_zip_output
 #    - debug: msg="{{ venv_zip_output }}"
 
     # for shell variable expansion
     - name: zip up our /lib64/ site-packages
-      shell: "cd $VIRTUAL_ENV/lib64/python2.7/dist-packages; zip -r9 {{ lambda_zip_path }} *"
+      shell: "zip -r9 {{ lambda_zip_path }} * chdir={{ remote_venv_path }}/lib64/python2.7/dist-packages/"
 #      register: venv_zip_output
     - debug: msg="{{ venv_zip_output }}"
 

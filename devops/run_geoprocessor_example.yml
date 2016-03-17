@@ -8,13 +8,13 @@
   roles:
     - ansible-lambda
 
-- include: "{{ playbook_dir }}/iam_create_user.yml"
-
-- name: create ec2 instance
-  hosts: localhost
-  gather_facts: yes
-  roles:
-    - create_box_ec2
+#- include: "{{ playbook_dir }}/iam_create_user.yml"
+#
+#- name: create ec2 instance
+#  hosts: localhost
+#  gather_facts: yes
+#  roles:
+#    - create_box_ec2
 
 - name: remote build virtualenv
   hosts: ec2
@@ -83,7 +83,7 @@
         state: absent
         dest: "{{ remote_venv_path }}"
 
-  # TODO: make these dynamic or part of Ansible
+  # TODO: decide if we can make these dynamic or part of Ansible
 - name: copy build.sh and bundle.sh files
   hosts: ec2
   gather_facts: yes
@@ -102,23 +102,22 @@
         mode: 0777
       with_items: "{{ clib_builder_scripts.stdout_lines }}"
 
-# TODO: why does this happen?
-# this hangs for some reason and screws up the build
-#- name: run build.sh to build PROJ4, GEOS and GDAL deps
-#  hosts: ec2
-#  gather_facts: yes
-#  tasks:
-#    - name: shell out to run the build
-#      shell: /bin/bash build.sh chdir="/home/{{ remote_user }}/"
-#
-#    - name: source our new ENV(s)
-#      shell: source "{{ remote_working_dir }}"/CLIB_ENVS.sh
+# TODO: what is happening here? Is it hanging?
+- name: run build.sh to build PROJ4, GEOS and GDAL deps
+  hosts: ec2
+  gather_facts: yes
+  tasks:
+    - name: shell out to run the build
+      shell: /bin/bash build.sh chdir="/home/{{ remote_user }}/"
 
-#- include: "{{ playbook_dir }}/bundle_on_ec2.yml"
+    - name: source our new ENV(s)
+      shell: source "{{ remote_working_dir }}"/CLIB_ENVS.sh
 
-#- include: "{{ playbook_dir }}/create_s3_buckets.yml"
-#
-## localhost
-#- include: "{{ playbook_dir }}/upload_bundle_to_s3.yml"
-#
-#- include: "{{ playbook_dir }}/create_aws_lambda_function.yml"
+- include: "{{ playbook_dir }}/bundle_on_ec2.yml"
+
+- include: "{{ playbook_dir }}/create_s3_buckets.yml"
+
+# localhost
+- include: "{{ playbook_dir }}/upload_bundle_to_s3.yml"
+
+- include: "{{ playbook_dir }}/create_aws_lambda_function.yml"
