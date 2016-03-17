@@ -17,7 +17,7 @@ This is part tutorial and part example. The goal was to build a toolchain to hel
     $ virtualenv --python=$DEFAULT_PY venv
     $ source venv/bin/activate
     ```
-0. pip install -r requirements
+0. run `pip install -r requirements`
 
 ## Create an IAM User to Run the Examples
 0. we won't run these examples with the AWS root account, so let's create a new IAM user
