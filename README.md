@@ -44,7 +44,7 @@ This is part tutorial and part example. The goal was to build a toolchain to hel
     ```bash
     $ source aws_creds.sh
     ```
-0. now create a new IAM user with the following command. Note, this creates a user with same AdminAccess policy as the root account which is not what most people want. To restrict the permissions override the policy json and `policy_path` in `overrides/iam_user_vars.yml`
+0. now create a new IAM user with the following command. Note, this creates a user with same AdminAccess policy as the root account which is not what most people want. To restrict the permissions override the policy JSON and `policy_path` in `overrides/iam_user_vars.yml`
 
     ```bash
     $ ansible-playbook ./devops/iam_create_user.yml --extra-vars="overrides_filename=iam_users"
