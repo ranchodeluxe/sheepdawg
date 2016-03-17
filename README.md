@@ -70,14 +70,16 @@ This is part tutorial and part example. The goal was to build a toolchain to hel
 0. create an ec2 build box where we we'll bundle our Lambda code and it's dependencies into a zipfile as [described in the tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html)
 
     ```bash
-    $ ansible-playbook ./devops/ec2_create_instance.yml --extra-vars="overrides_filename=aws_with_amazon_s3_tutorial_vars"
+    $ ansible-playbook ./devops/ec2_create_instance.yml \
+        --extra-vars="overrides_filename=aws_with_amazon_s3_tutorial_vars"
     ```
 0. then run this command to setup the S3 buckets, Lambda function, policies and permissions as [described in the tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html)
 
     ```bash
     $ ansible-playbook -i devops/inventories/dynamic \
         devops/run_aws_lambda_with_s3_tutorial.yml --private-key=./private.pem -u ec2-user \
-        --extra-vars="overrides_filename=aws_with_amazon_s3_tutorial_vars" --limit="tag_Name_tutorial*ec2"
+        --extra-vars="overrides_filename=aws_with_amazon_s3_tutorial_vars" \
+        --limit="tag_Name_tutorial*ec2"
     ```
 0. when it's done running go take a look at the source S3 bucket it created which should be called `lambda-example-v1` unless you overrode the config vars to call it something else in `overrides/aws_with_amazon_s3_tutorial_vars.yml`
 0. there's a single image that was uploaded called `HappyFace.jpg` just to make sure it's working
@@ -99,14 +101,16 @@ This is part tutorial and part example. The goal was to build a toolchain to hel
 0. create a new build box. `t2.micro` will build the C dependencies very slow. this example uses overrides for a larger image and also different names so we can tell the AWS infrastructure apart. modify `overrides/geoprocessing_example.yml` if needed.
 
     ```bash
-    $ ansible-playbook ./devops/ec2_create_instance.yml --extra-vars="overrides_filename=geoprocessing_example"
+    $ ansible-playbook ./devops/ec2_create_instance.yml \
+        --extra-vars="overrides_filename=geoprocessing_example"
     ```
 0. then run this command to setup the S3 buckets, Lambda function, policies and permissions. make sure you have some coffee at hand. it's gonna take awhile to build to the C libs.
 
     ```bash
     $ ansible-playbook -i devops/inventories/dynamic \
         devops/run_geoprocessor_example.yml --private-key=./private.pem -u ec2-user \
-        --extra-vars="overrides_filename=geoprocessing_example"  --limit="tag_Name_geoprocess*ec2"
+        --extra-vars="overrides_filename=geoprocessing_example"  \
+        --limit="tag_Name_geoprocess*ec2"
     ```
 0. test the build out...to be continued
 
