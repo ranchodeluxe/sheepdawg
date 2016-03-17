@@ -35,7 +35,9 @@
       register: s3_put_output
 
 # remote ec2
-- include: "{{ playbook_dir }}/build_and_bundle_on_ec2.yml"
+- include: "{{ playbook_dir }}/build_on_ec2.yml"
+
+- include: "{{ playbook_dir }}/bundle_on_ec2.yml"
 
 # localhost
 - include: "{{ playbook_dir }}/upload_bundle_to_s3.yml"

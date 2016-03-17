@@ -1,0 +1,124 @@
+---
+# $ ansible-playbook -i devops/inventories/dynamic devops/run_geoprocessor_example.yml --private-key=./private.pem -u ec2-user --extra-vars="overrides_filename=geoprocessing_example.yml"
+
+# localhost
+- name: setup ansible-lambda modules
+  hosts: localhost
+  gather_facts: no
+  roles:
+    - ansible-lambda
+
+- include: "{{ playbook_dir }}/iam_create_user.yml"
+
+- name: create ec2 instance
+  hosts: localhost
+  gather_facts: yes
+  roles:
+    - create_box_ec2
+
+- name: remote build virtualenv
+  hosts: ec2
+  gather_facts: yes
+  tasks:
+    - include_vars: "{{ playbook_dir }}/../overrides/{{ overrides_filename | default('empty') }}{{ ('.yml' in (overrides_filename|default('empty')) ) | ternary('','.yml') }}"
+
+    - name: upgrade all packages
+      yum:
+        name: "*"
+        state: latest
+      become: yes
+
+    - name: groupinstall gcc and buildessential and other developer tools
+      yum: name="@Development Tools" state=present
+      become: yes
+
+    - name: install python base deps
+      yum:
+        state: present
+        name: python27-devel,python27-setuptools,python27-virtualenv,python27-pip
+      become: yes
+
+    - name: yum install dynamic dependencies and libs
+      yum:
+        state: present
+        name: "{{ ','.join( yum_dependency_list ) }}"
+      become: yes
+
+    - name: make sure our working remote directory is created if the var is set
+      file:
+        state: directory
+        dest: "{{ remote_working_dir }}"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
+        mode:  0777
+      when: remote_working_dir is defined
+
+    - name: copy the handler.py
+      copy:
+        src: "{{ lambda_src_handler_file }}"
+        dest: "{{ lambda_dst_handler_file }}"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
+        mode: 0744
+
+    - name: copy the worker.py
+      copy:
+        src: "{{ lambda_src_worker_file }}"
+        dest: "{{ lambda_dst_worker_file }}"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
+        mode: 0744
+      when: lambda_src_worker_file is defined and lambda_dst_worker_file is defined
+
+    - name: copy the lambda requirements.txt
+      copy:
+        src: "{{ lambda_src_requirements_file }}"
+        dest: "{{ lambda_dst_requirements_file }}"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
+        mode: 0644
+
+    - name: remove the virtual environment
+      file:
+        state: absent
+        dest: "{{ remote_venv_path }}"
+
+  # TODO: make these dynamic or part of Ansible
+- name: copy build.sh and bundle.sh files
+  hosts: ec2
+  gather_facts: yes
+  tasks:
+    - name: get our build scripts
+      local_action: "shell ls -L {{playbook_dir}}/files/geo/*.sh"
+      register: clib_builder_scripts
+
+    - debug: var=clib_builder_scripts
+    - name: copy to remote server
+      copy:
+        src: "{{ item }}"
+        dest: "/home/{{ remote_user }}/"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
+        mode: 0777
+      with_items: "{{ clib_builder_scripts.stdout_lines }}"
+
+# TODO: why does this happen?
+# this hangs for some reason and screws up the build
+#- name: run build.sh to build PROJ4, GEOS and GDAL deps
+#  hosts: ec2
+#  gather_facts: yes
+#  tasks:
+#    - name: shell out to run the build
+#      shell: /bin/bash build.sh chdir="/home/{{ remote_user }}/"
+#
+#    - name: source our new ENV(s)
+#      shell: source "{{ remote_working_dir }}"/CLIB_ENVS.sh
+
+#- include: "{{ playbook_dir }}/bundle_on_ec2.yml"
+
+#- include: "{{ playbook_dir }}/create_s3_buckets.yml"
+#
+## localhost
+#- include: "{{ playbook_dir }}/upload_bundle_to_s3.yml"
+#
+#- include: "{{ playbook_dir }}/create_aws_lambda_function.yml"

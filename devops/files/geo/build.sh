@@ -1,10 +1,17 @@
 #!/bin/bash
+
+#
+# parent Ansible script in charge of creating
+# 1. ~/lambda DIR
+# 2. sudo yum installing deps
+#
+export PYTHONPATH=~/lambda/venv/lib/python2.7/dist-packages/:~/lambda/venv/lib64/python2.7/dist-packages/
 GEOS_TAR=http://download.osgeo.org/geos/geos-3.5.0.tar.bz2
 PROJ4_TAR=https://github.com/OSGeo/proj.4/archive/4.9.2.tar.gz
 GDAL_TAR=http://download.osgeo.org/gdal/1.11.3/gdal-1.11.3.tar.gz
 PREFIX_DIR=~/lambda/local
-GEOS_CONFIG=$PREFIX_DIR/bin/geos-config
-GDAL_CONFIG=$PREFIX_DIR/bin/gdal-config
+GEOS_CONFIG_PATH=$PREFIX_DIR/bin/geos-config
+GDAL_CONFIG_PATH=$PREFIX_DIR/bin/gdal-config
 
 #
 # create working dir
@@ -15,19 +22,20 @@ GDAL_CONFIG=$PREFIX_DIR/bin/gdal-config
 #   virtualenvs/
 #     local/
 #       lib/
-#         *.so 
+#         *.so
 #
-mkdir -p ~/lambda/local
-cd lambda
+mkdir -p $PREFIX_DIR
+cd ~/lambda
 
 #
 # binary package deps
+# NOTE: handled by Ansible before this runs
 #
-sudo yum install python27-devel python27-pip gcc libjpeg-devel zlib-devel gcc-c++
+# sudo yum install python27-devel python27-pip gcc libjpeg-devel zlib-devel gcc-c++
 
 #
-# create virtualenv 
-# we have to do this before 
+# create virtualenv
+# we have to do this before
 # GDAL python plugin is installed
 #
 virtualenv --python=/usr/bin/python ~/lambda/venv
@@ -61,7 +69,7 @@ wget $GDAL_TAR
 tar -xzvf $tarfile
 cd gdal-1.11.3/
 ./configure --prefix=$PREFIX_DIR \
-            --with-geos=$GEOS_CONFIG \
+            --with-geos=$GEOS_CONFIG_PATH \
             --with-python \
             --with-static-proj4=$PREFIX_DIR
 make &> GDAL_MAKE.out
@@ -71,12 +79,21 @@ cd ../
 #
 # export required ENVS for raterio, shapely and fiona
 #
-export GEOS_CONFIG=$GEOS_CONFIG
-export GDAL_CONFIG=$GDAL_CONFIG
+header="#!/bin/bash";
+destdir=~/lambda/CLIB_ENVS.sh;
+touch $destdir;
+if [ -f "$destdir" ]
+then
+    echo "$header" > "$destdir"
+    echo "export GEOS_CONFIG=$GEOS_CONFIG_PATH" >> "$destdir"
+    echo "export GDAL_CONFIG=$GDAL_CONFIG_PATH" >> "$destdir"
+    echo "export LD_LIBRARY_PATH=$PREFIX_DIR/lib" >> "$destdir"
+    echo "export PYTHONPATH=$PYTHONPATH:/home/ec2-user/lambda/gdal-1.11.3/swig/python/build/lib.linux-x86_64-2.7/" >> "$destdir"
+fi
+export GEOS_CONFIG=$GEOS_CONFIG_PATH
+export GDAL_CONFIG=$GDAL_CONFIG_PATH
+#source ~/lambda/CLIB_ENVS.sh
 
-#
-# pip install requirements
-#
 pip install numpy==1.10.4
 pip install rasterio==0.31.0
 pip install Fiona==1.6.3

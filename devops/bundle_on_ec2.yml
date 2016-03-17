@@ -1,0 +1,35 @@
+---
+# remote ec2
+- name: remote bundle on ec2
+  hosts: ec2
+  gather_facts: yes
+  tasks:
+    - include_vars: "{{ playbook_dir }}/../overrides/{{ overrides_filename | default('empty') }}{{ ('.yml' in (overrides_filename|default('empty')) ) | ternary('','.yml') }}"
+
+    - name: remove any existing zips from previous runs, ignore errors otherwise
+      file:
+        state: absent
+        dest: "{{ lambda_zip_path }}"
+
+    - name: zip up our lambda handlers.py and workers.py
+      shell: "cd $(dirname {{ lambda_dst_handler_file }}); zip -r9 {{ lambda_zip_path }} $(basename {{ lambda_dst_handler_file }})"
+      register: venv_zip_output
+    - debug: msg="{{ venv_zip_output }}"
+
+    # for shell variable expansion
+    - name: zip up our /lib/ site-packages
+      shell: "cd $VIRTUAL_ENV/lib/python2.7/dist-packages; zip -r9 {{ lambda_zip_path }} *"
+      register: venv_zip_output
+#    - debug: msg="{{ venv_zip_output }}"
+
+    # for shell variable expansion
+    - name: zip up our /lib64/ site-packages
+      shell: "cd $VIRTUAL_ENV/lib64/python2.7/dist-packages; zip -r9 {{ lambda_zip_path }} *"
+#      register: venv_zip_output
+    - debug: msg="{{ venv_zip_output }}"
+
+    - name: fetch our bundled zipfile from remote to local
+      fetch:
+        src: "{{ lambda_zip_path }}"
+        flat: yes
+        dest: "{{ playbook_dir }}/../"

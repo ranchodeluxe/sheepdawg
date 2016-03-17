@@ -23,7 +23,7 @@
         new_aws_access_key: "{{ iam_user_output.user_meta.access_keys[0].access_key_id }}"
         new_aws_secret_key: "{{ iam_user_output.user_meta.access_keys[0].secret_access_key }}"
         account_number: "{{ iam_user_output.user_meta.created_user.arn.split(':')[4] }}"
-      when: iam_user_output.user_meta
+      when: iam_user_output.user_meta is defined
       register: new_facts
       failed_when: "{{ 'changed' not in iam_user_output.keys() }}"
       ignore_errors: yes
@@ -35,7 +35,7 @@
         src: templates/user_aws_creds.j2
         dest: "{{ playbook_dir }}/../new_aws_creds.sh"
         mode: 0777
-      when: new_facts.ansible_facts
+      when: new_facts.ansible_facts is defined
       ignore_errors: yes
 
     - name: add AdminAccess policy for new user

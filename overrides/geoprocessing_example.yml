@@ -1,0 +1,37 @@
+# ec2 vars
+ec2_name: geoprocess
+instance_type: t2.medium
+
+# s3
+s3_bucket_nmspace: geoprocess
+s3_bucket_nmversion: v1
+s3_bucket_names:
+  - name: "{{ s3_bucket_nmspace }}-{{ s3_bucket_nmversion }}"
+  - name: "{{ s3_bucket_nmspace }}-{{ s3_bucket_nmversion }}.geojson"
+s3_src_bucket_name: "{{ s3_bucket_names[0].name }}"
+s3_target_bucket_name: "{{ s3_bucket_names[1].name }}"
+s3_code_bucket_name: "{{ s3_bucket_nmspace }}-code-{{ s3_bucket_nmversion }}"
+
+# lambda ec2 build box
+remote_working_dir: "/home/{{ remote_user }}/lambda"
+remote_venv_path: "/home/{{ remote_user }}/venv"
+lambda_src_handler_file: "{{ playbook_dir }}/files/geo/handler.py"
+lambda_dst_handler_file: "/home/{{ remote_user }}/lambda/handler.py"
+lambda_src_worker_file: "{{ playbook_dir }}/files/geo/worker.py"
+lambda_dst_worker_file: "/home/{{ remote_user }}/lambda/geoprocess.py"
+lambda_src_requirements_file: "{{ playbook_dir }}/files/geo/requirements.txt"
+#lambda_dst_requirements_file: "/home/{{ remote_user }}/requirements.txt"
+lambda_zip_name: "lambda_function.zip"
+lambda_zip_path: "/home/{{ remote_user }}/lambda/{{ lambda_zip_name }}"
+yum_dependency_list:
+  - libjpeg-devel
+  - zlib-devel
+  - gcc-c++
+
+# lambda
+lambda_nmversion: v1
+lambda_function_name: "GeoprocessExample{{lambda_nmversion}}"
+lambda_s3_permission_statement: "{{ lambda_function_name }}-permission-statement"
+deployment_package_dir_path: "{{ playbook_dir }}/.."
+deployment_package_name: "{{ lambda_zip_name }}"
+lambda_function_module_name_dot_handler: "handler.handler"  # this is the root level Python <module name>.handler function call

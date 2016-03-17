@@ -7,3 +7,4 @@ lambda_src_requirements_file: "/usr/local/src/ansible-geosheep/workspace/require
 lambda_dst_requirements_file: "/home/{{ remote_user }}/requirements.txt"
 lambda_zip_name: "lambda.zip"
 lambda_zip_path: "/home/{{ remote_user }}/{{ lambda_zip_name }}"
+yum_dependency_list: []
