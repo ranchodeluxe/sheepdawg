@@ -3,7 +3,8 @@
 This is part tutorial and part example. The goal was to build a toolchain to help myself learn and write AWS Lambda handlers without the configuration headaches. Included is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). A geoprocessing pipeline using shared libs is almost complete. I'm hoping to build two more examples that are covered in tickets. Everything uses the provisioning tool Ansible because working with AWS configuration can lead to boredom and death. A few people asked why this was built with Ansible. If you feel this way, then please read the [Why Ansible](#why-ansible) section.
 
 ## Getting Started
-0. `git` checkout this respository
+0. `git` checkout this respository:
+
     ```bash
     $ mkdir -p /usr/local/src/sheepdawg
     $ cd /usr/local/src/sheepdawg
