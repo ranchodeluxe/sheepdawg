@@ -1,6 +1,6 @@
 
 <img align="right" src="images/jump.jpg"/>
-This is part tutorial and part example. The goal was to build a toolchain to help myself learn and write AWS Lambda handlers without the configuration headaches. Included is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). A more in-depth example for creating a geoprocessing pipeline using shared libs is currently baking. Everything uses the provisioning tool Ansible because working with AWS configuration can lead to boredom and death. A few people asked why this was built with Ansible. If you feel this way, then please read the [Why Ansible](#why-ansible) section.
+This is part tutorial and part example. The goal was to build a toolchain to help myself learn and write AWS Lambda handlers without the configuration headaches. Included is a build of the [AWS S3 Lambda tutorial](http://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html). Another example for creating a geoprocessing pipeline using shared libs is almost complete. There's a couple other examples explained in tickets that I'm hoping to build also. Everything uses the provisioning tool Ansible because working with AWS configuration can lead to boredom and death. A few people asked why this was built with Ansible. If you feel this way, then please read the [Why Ansible](#why-ansible) section.
 
 ## Getting Started
 0. `git` checkout this respository
